@@ -3,11 +3,9 @@ import re
 def FindJsDocComments(script):
   return re.finditer('/\*\*.*?\*/', script, re.DOTALL)
 
-def FindIdentiferForComment(comment_match):
-  end_index = comment_match.end()
+def FindNextIdentifer(script, pos=0):
   identifier_regex = re.compile('(?:\w+\s*\.\s*)*\w+')
-  script = comment_match.string
-  return identifier_regex.search(script, comment_match.end())
+  return identifier_regex.search(script, pos=pos)
 
 def StripWhitespace(original_string):
   return re.sub('\s*', '', original_string)
