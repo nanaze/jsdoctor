@@ -9,3 +9,6 @@ def FindIdentiferForComment(comment_match):
   script = comment_match.string
   return identifier_regex.search(script, comment_match.end())
 
+def StripWhitespace(original_string):
+  return re.sub('\s*', '', original_string)
+

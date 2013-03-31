@@ -16,6 +16,22 @@ class ParserTestCase(unittest.TestCase):
     identifier_match = parser.FindIdentiferForComment(match)
     self.assertEquals('goog.bar.baz', identifier_match.group())
 
+  def testOddIdentifier(self):
+    test_script = """\
+/**
+ * Moose.
+ */
+goog
+.
+bar.
+baz   .
+qux =
+"""
+
+    match = list(parser.FindJsDocComments(test_script))[0]
+    identifier_match = parser.FindIdentiferForComment(match)
+    symbol = parser.StripWhitespace(identifier_match.group())
+    self.assertEquals('goog.bar.baz.qux', symbol)
 
 _TEST_SCRIPT = """\
 var = 2;
@@ -25,6 +41,8 @@ var = 2;
  */
 goog.bar.baz
 """
+
+
 
 if __name__ == '__main__':
     unittest.main()
