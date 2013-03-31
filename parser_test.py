@@ -13,7 +13,7 @@ class ParserTestCase(unittest.TestCase):
 
   def testFindIdentifier(self):
     match = list(parser.FindJsDocComments(_TEST_SCRIPT))[0]
-    identifier_match = parser.FindIdentiferForComment(match)
+    identifier_match = parser.FindNextIdentifer(match.string, match.end())
     self.assertEquals('goog.bar.baz', identifier_match.group())
 
   def testOddIdentifier(self):
@@ -29,7 +29,7 @@ qux =
 """
 
     match = list(parser.FindJsDocComments(test_script))[0]
-    identifier_match = parser.FindIdentiferForComment(match)
+    identifier_match = parser.FindNextIdentifer(match.string, match.end())
     symbol = parser.StripWhitespace(identifier_match.group())
     self.assertEquals('goog.bar.baz.qux', symbol)
 
