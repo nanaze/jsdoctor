@@ -1,4 +1,4 @@
-import parser
+import scanner
 
 import sys
 
@@ -10,7 +10,7 @@ def main():
   for path in paths:
     with open(path) as f:
       script = f.read()
-      for comment, symbol in parser.ExtractDocumentedSymbols(script):
+      for comment, symbol in scanner.ExtractDocumentedSymbols(script):
         print 'symbol', symbol.GetSymbol()
         print 'comment', comment.GetText()
 
