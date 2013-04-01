@@ -16,6 +16,56 @@ class ParserTestCase(unittest.TestCase):
     identifier_match = parser.FindNextIdentifer(match.string, match.end())
     self.assertEquals('goog.bar.baz', identifier_match.group())
 
+  def testExtractText(self):
+    script = """
+/**
+ * Slaughterhouse five.
+ *
+ * @return {string} The result, as a string.
+ */
+"""
+    
+    match = list(parser.FindJsDocComments(script))[0]
+    comment = match.group()
+    text = parser.ExtractTextFromJsDocComment(comment)
+    self.assertEquals('Slaughterhouse five.\n\n' +
+                      '@return {string} The result, as a string.',
+                      text)
+
+  def testExtractDocumentedSymbols(self):
+    script = """
+/**
+ * Test goog dom.
+ *
+ * One two three.
+ */
+goog.dom.test
+
+/**
+ * Test goog style.
+ *
+ * Four five six.
+ */
+goog.style.test
+"""
+
+    pairs = list(parser.ExtractDocumentedSymbols(script))
+
+    self.assertEquals(2, len(pairs))
+
+    jsdoc, symbol = pairs[0]
+    self.assertEquals(
+      'Test goog dom.\n\nOne two three.',
+      jsdoc.GetText())
+    self.assertEquals('goog.dom.test', symbol.GetSymbol())
+
+    jsdoc, symbol = pairs[1]
+    self.assertEquals(
+      'Test goog style.\n\nFour five six.',
+      jsdoc.GetText())
+    self.assertEquals('goog.style.test', symbol.GetSymbol())
+
+
   def testOddIdentifier(self):
     test_script = """\
 /**
