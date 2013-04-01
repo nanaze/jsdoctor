@@ -20,6 +20,24 @@ class JsDoc(object):
 class NoIdentifierError(Exception):
   pass
 
+_BASE_REGEX_STRING = '^\s*goog\.%s\(\s*[\'"](.+)[\'"]\s*\)'
+_PROVIDE_REGEX = re.compile(_BASE_REGEX_STRING % 'provide')
+_REQUIRES_REGEX = re.compile(_BASE_REGEX_STRING % 'require')
+
+def YieldProvides(source):
+  for line in source.splitlines():
+    match = _PROVIDE_REGEX.match(line)
+    if match:
+      yield match.group(1)
+
+def YieldRequires(source):
+  for line in source.splitlines():
+    match = _REQUIRES_REGEX.match(line)
+    if match:
+      yield match.group(1)
+  
+  
+
 def ExtractDocumentedSymbols(script):
 
   for comment_match in FindJsDocComments(script):

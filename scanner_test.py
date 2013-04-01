@@ -1,10 +1,25 @@
-import parser
+import scanner
 import unittest
 
-class ParserTestCase(unittest.TestCase):
+class ScannerTestCase(unittest.TestCase):
+
+  def testProvides(self):
+    source = """
+goog.provide('goog.dom');
+goog.provide('goog.style');
+
+goog.require('goog.array');
+goog.require('goog.string');
+"""
+    provides = list(scanner.YieldProvides(source))
+    requires = list(scanner.YieldRequires(source))
+
+    self.assertEquals(['goog.dom', 'goog.style'], provides)
+    self.assertEquals(['goog.array', 'goog.string'], requires)
+
 
   def testFindDocComments(self):
-    matches = list(parser.FindJsDocComments(_TEST_SCRIPT))
+    matches = list(scanner.FindJsDocComments(_TEST_SCRIPT))
     self.assertEquals(1, len(matches))
 
     match = matches[0]
@@ -12,8 +27,8 @@ class ParserTestCase(unittest.TestCase):
     self.assertEquals(34, match.end())
 
   def testFindIdentifier(self):
-    match = list(parser.FindJsDocComments(_TEST_SCRIPT))[0]
-    identifier_match = parser.FindNextIdentifer(match.string, match.end())
+    match = list(scanner.FindJsDocComments(_TEST_SCRIPT))[0]
+    identifier_match = scanner.FindNextIdentifer(match.string, match.end())
     self.assertEquals('goog.bar.baz', identifier_match.group())
 
   def testExtractText(self):
@@ -25,9 +40,9 @@ class ParserTestCase(unittest.TestCase):
  */
 """
     
-    match = list(parser.FindJsDocComments(script))[0]
+    match = list(scanner.FindJsDocComments(script))[0]
     comment = match.group()
-    text = parser.ExtractTextFromJsDocComment(comment)
+    text = scanner.ExtractTextFromJsDocComment(comment)
     self.assertEquals('Slaughterhouse five.\n\n' +
                       '@return {string} The result, as a string.',
                       text)
@@ -49,7 +64,7 @@ goog.dom.test
 goog.style.test
 """
 
-    pairs = list(parser.ExtractDocumentedSymbols(script))
+    pairs = list(scanner.ExtractDocumentedSymbols(script))
 
     self.assertEquals(2, len(pairs))
 
@@ -78,9 +93,9 @@ baz   .
 qux =
 """
 
-    match = list(parser.FindJsDocComments(test_script))[0]
-    identifier_match = parser.FindNextIdentifer(match.string, match.end())
-    symbol = parser.StripWhitespace(identifier_match.group())
+    match = list(scanner.FindJsDocComments(test_script))[0]
+    identifier_match = scanner.FindNextIdentifer(match.string, match.end())
+    symbol = scanner.StripWhitespace(identifier_match.group())
     self.assertEquals('goog.bar.baz.qux', symbol)
 
 _TEST_SCRIPT = """\
