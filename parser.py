@@ -27,7 +27,8 @@ def ExtractDocumentedSymbols(script):
 
     identifier = FindNextIdentifer(script, comment_match.end())
     if not identifier:
-      raise NoIdentiferFoundError('Found no identifier for comment: ' + jsdoc.GetComment())
+      raise NoIdentiferFoundError(
+        'Found no identifier for comment: ' + jsdoc.GetComment())
 
     symbol = Symbol(identifier)
     yield jsdoc, symbol
