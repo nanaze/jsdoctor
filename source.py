@@ -10,6 +10,14 @@ class Source(object):
     self.symbols = set()
     self.filecomment = None
 
+  def __str__(self):
+    source_string = super(Source, self).__str__()
+
+    if self.path:
+      source_string += ' ' + self.path
+
+    return source_string
+
 class Symbol(object):
   def __init__(self, identifier, start, end):
     self.identifier = identifier
@@ -18,12 +26,21 @@ class Symbol(object):
     self.source = None
     self.comment = None
 
+  def __str__(self):
+    symbol_string = super(Symbol, self).__str__()
+
+    symbol_string += ' ' + self.identifier
+
+    if self.source:
+      symbol_string += ' ' + str(self.source)
+
+    return symbol_string
+
 class Comment(object):
   def __init__(self, text, start, end):
     self.text = text
     self.start = start
     self.end = end
-
 
 def ScanScript(script, path=None):
 
