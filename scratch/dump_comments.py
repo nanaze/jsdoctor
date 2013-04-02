@@ -14,6 +14,5 @@ def main():
         print 'symbol', symbol.GetSymbol()
         print 'comment', comment.GetText()
 
-
 if __name__ == '__main__':
   main()

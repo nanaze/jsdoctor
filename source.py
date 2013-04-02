@@ -1,18 +1,22 @@
 import scanner
 
 class Source(object):
-  def __init__(self, script, provides, requires, comments, path=None):
+  def __init__(self, script, path=None):
     self.script = script
-    self.provides = provides
-    self.requires = requires
-    self.comments = comments
     self.path = path
+    
+    self.provides = set()
+    self.requires = set()
+    self.symbols = set()
+
 
 class Symbol(object):
   def __init__(self, identifier, start, end):
     self.identifier = identifier
     self.start = start
     self.end = end
+    self.source = None
+    self.comment = None
 
 class Comment(object):
   def __init__(self, symbol, text, start, end):
@@ -21,14 +25,16 @@ class Comment(object):
     self.start = start
     self.end = end
     
+    
 
 def ScanScript(script, path=None):
-  provides = set(scanner.YieldProvides(script))
-  requires = set(scanner.YieldRequires(script))
+
+  source = Source(script, path)
+  source.provides.update(set(scanner.YieldProvides(script)))
+  source.requires.update(set(scanner.YieldRequires(script)))
 
   pairs = scanner.ExtractDocumentedSymbols(script)
 
-  comments = set()
   for comment_match, identifier_match in pairs:
 
     # TODO(nanaze): Identify scoped variables and expand identifiers.
@@ -37,8 +43,12 @@ def ScanScript(script, path=None):
 
     comment_text = scanner.ExtractTextFromJsDocComment(comment_match.group())
     comment = Comment(symbol, comment_text, comment_match.start(), comment_match.end())
-    comments.add(comment)
+    symbol.source = source
+    symbol.comment = comment
+    source.symbols.add(symbol)
 
-  return Source(script, provides, requires, comments, path)
+  return source
+
+
     
     

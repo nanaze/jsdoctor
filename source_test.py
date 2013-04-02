@@ -11,11 +11,11 @@ class SourceTestCase(unittest.TestCase):
     self.assertEquals(
       set(['goog.ccc', 'goog.ddd']), test_source.requires)
 
-    self.assertEquals(1, len(test_source.comments))
+    self.assertEquals(1, len(test_source.symbols))
 
-    comment = list(test_source.comments)[0]
-    self.assertEquals('Testing testing.', comment.text)
-    self.assertEquals('goog.aaa.bbb', comment.symbol.identifier)
+    symbol = list(test_source.symbols)[0]
+    self.assertEquals('Testing testing.', symbol.comment.text)
+    self.assertEquals('goog.aaa.bbb', symbol.identifier)
     
 _TEST_SCRIPT = """
 goog.provide('goog.aaa');
