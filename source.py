@@ -30,6 +30,8 @@ def ScanScript(script, path=None):
 
   comments = set()
   for comment_match, identifier_match in pairs:
+
+    # TODO(nanaze): Identify scoped variables and expand identifiers.
     identifier = scanner.StripWhitespace(identifier_match.group())
     symbol = Symbol(identifier, identifier_match.start(), identifier_match.end())
 
