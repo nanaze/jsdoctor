@@ -8,7 +8,7 @@ class Source(object):
     self.provides = set()
     self.requires = set()
     self.symbols = set()
-
+    self.filecomment = None
 
 class Symbol(object):
   def __init__(self, identifier, start, end):
@@ -19,13 +19,11 @@ class Symbol(object):
     self.comment = None
 
 class Comment(object):
-  def __init__(self, symbol, text, start, end):
-    self.symbol = symbol
+  def __init__(self, text, start, end):
     self.text = text
     self.start = start
     self.end = end
-    
-    
+
 
 def ScanScript(script, path=None):
 
@@ -36,16 +34,20 @@ def ScanScript(script, path=None):
   pairs = scanner.ExtractDocumentedSymbols(script)
 
   for comment_match, identifier_match in pairs:
-
-    # TODO(nanaze): Identify scoped variables and expand identifiers.
-    identifier = scanner.StripWhitespace(identifier_match.group())
-    symbol = Symbol(identifier, identifier_match.start(), identifier_match.end())
-
     comment_text = scanner.ExtractTextFromJsDocComment(comment_match.group())
-    comment = Comment(symbol, comment_text, comment_match.start(), comment_match.end())
-    symbol.source = source
-    symbol.comment = comment
-    source.symbols.add(symbol)
+    comment = Comment(comment_text, comment_match.start(), comment_match.end())
+    
+    if identifier_match:
+      # TODO(nanaze): Identify scoped variables and expand identifiers.
+      identifier = scanner.StripWhitespace(identifier_match.group())
+      symbol = Symbol(identifier, identifier_match.start(), identifier_match.end())
+
+      symbol.source = source
+      symbol.comment = comment
+      source.symbols.add(symbol)
+    else:
+      assert not source.filecomment, '@fileoverview comment made more than once' 
+      source.filecomment = comment
 
   return source
 

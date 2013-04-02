@@ -1,6 +1,6 @@
 import re
 
-class NoIdentifierError(Exception):
+class NoIdentifierFoundError(Exception):
   pass
 
 _BASE_REGEX_STRING = '^\s*goog\.%s\(\s*[\'"](.+)[\'"]\s*\)'
@@ -22,9 +22,16 @@ def YieldRequires(source):
 def ExtractDocumentedSymbols(script):
 
   for comment_match in FindJsDocComments(script):
-    identifier_match = FindNextIdentifer(script, comment_match.end())
-    if not identifier_match:
-      raise NoIdentiferFoundError(
+
+    identifier_match = None
+
+    if re.match('\b@fileoverview\b', comment_match.group()):
+      # This is a file overview comment.
+      pass
+    else: 
+      identifier_match = FindNextIdentifer(script, comment_match.end())
+      if not identifier_match:
+        raise NoIdentiferFoundError(
         'Found no identifier for comment: ' + identifier_match.group())
 
     yield comment_match, identifier_match
