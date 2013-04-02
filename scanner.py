@@ -1,22 +1,5 @@
 import re
 
-class Symbol(object):
-  def __init__(self, match):
-    self.match = match
-
-  def GetSymbol(self):
-    return StripWhitespace(self.match.group())
-
-class JsDoc(object):
-  def __init__(self, match):
-    self.match = match
-
-  def GetComment(self):
-    return self.match.group()
-
-  def GetText(self):
-    return ExtractTextFromJsDocComment(self.GetComment())
-
 class NoIdentifierError(Exception):
   pass
 
@@ -36,20 +19,15 @@ def YieldRequires(source):
     if match:
       yield match.group(1)
   
-  
-
 def ExtractDocumentedSymbols(script):
 
   for comment_match in FindJsDocComments(script):
-    jsdoc = JsDoc(comment_match)
-
-    identifier = FindNextIdentifer(script, comment_match.end())
-    if not identifier:
+    identifier_match = FindNextIdentifer(script, comment_match.end())
+    if not identifier_match:
       raise NoIdentiferFoundError(
-        'Found no identifier for comment: ' + jsdoc.GetComment())
+        'Found no identifier for comment: ' + identifier_match.group())
 
-    symbol = Symbol(identifier)
-    yield jsdoc, symbol
+    yield comment_match, identifier_match
     
   
 def FindJsDocComments(script):

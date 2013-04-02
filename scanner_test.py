@@ -68,17 +68,17 @@ goog.style.test
 
     self.assertEquals(2, len(pairs))
 
-    jsdoc, symbol = pairs[0]
+    comment_match, symbol_match = pairs[0]
     self.assertEquals(
-      'Test goog dom.\n\nOne two three.',
-      jsdoc.GetText())
-    self.assertEquals('goog.dom.test', symbol.GetSymbol())
+      '/**\n * Test goog dom.\n *\n * One two three.\n */',
+      comment_match.group())
+    self.assertEquals('goog.dom.test', symbol_match.group())
 
-    jsdoc, symbol = pairs[1]
+    comment_match, symbol_match = pairs[1]
     self.assertEquals(
-      'Test goog style.\n\nFour five six.',
-      jsdoc.GetText())
-    self.assertEquals('goog.style.test', symbol.GetSymbol())
+      '/**\n * Test goog style.\n *\n * Four five six.\n */',
+      comment_match.group())
+    self.assertEquals('goog.style.test', symbol_match.group())
 
 
   def testOddIdentifier(self):
