@@ -1,3 +1,4 @@
+import scanner
 import source
 import unittest
 
@@ -16,6 +17,15 @@ class SourceTestCase(unittest.TestCase):
     symbol = list(test_source.symbols)[0]
     self.assertEquals('Testing testing.', symbol.comment.text)
     self.assertEquals('goog.aaa.bbb', symbol.identifier)
+
+  def testIsMethodCall(self):
+    match = scanner.FindNextIdentifer('  aaa.bbb = 3');
+    self.assertEquals('aaa.bbb', match.group())
+    self.assertFalse(source._IsMethodCall(match))
+
+    match = scanner.FindNextIdentifer('  aaa.bbb(3)');
+    self.assertEquals('aaa.bbb', match.group())
+    self.assertTrue(source._IsMethodCall(match))
     
 _TEST_SCRIPT = """
 goog.provide('goog.aaa');

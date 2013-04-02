@@ -1,6 +1,7 @@
 import scanner
 import namespace
 import logging
+import re
 
 class Source(object):
   def __init__(self, script, path=None):
@@ -50,6 +51,17 @@ def _IsSymbolPartOfProvidedNamespaces(symbol, provided_namespaces):
       return True
   return False
 
+def _IsMethodCall(identifier_match):
+  remaining_string = identifier_match.string[identifier_match.end():]
+  match = re.search('[\S]', remaining_string)
+
+  if match:
+    if match.group() == '(':
+      # This is the opening method call.
+      return True
+
+  return False
+
 def ScanScript(script, path=None):
 
   source = Source(script, path)
@@ -67,8 +79,17 @@ def ScanScript(script, path=None):
       source.filecomment = comment
       continue
 
+    if _IsMethodCall(identifier_match):
+      # This is JsDoc on a method call, most likely a type cast of a return value.
+      # Ignore.
+      continue
+
     # TODO(nanaze): Identify scoped variables and expand identifiers.
     identifier = scanner.StripWhitespace(identifier_match.group())
+
+    if identifier.startswith('this.'):
+      logging.info('Skipping identifer. Ignoring "this." properties for now. ' + identifier)
+      continue
 
     # Ignore symbols that are not part of the provided namespace.
     if not _IsSymbolPartOfProvidedNamespaces(identifier, source.provides):
