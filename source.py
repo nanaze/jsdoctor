@@ -1,4 +1,6 @@
 import scanner
+import namespace
+import logging
 
 class Source(object):
   def __init__(self, script, path=None):
@@ -42,6 +44,12 @@ class Comment(object):
     self.start = start
     self.end = end
 
+def _IsSymbolPartOfProvidedNamespaces(symbol, provided_namespaces):
+  for ns in provided_namespaces:
+    if namespace.IsSymbolPartOfNamespace(symbol, ns):
+      return True
+  return False
+
 def ScanScript(script, path=None):
 
   source = Source(script, path)
@@ -53,18 +61,25 @@ def ScanScript(script, path=None):
   for comment_match, identifier_match in pairs:
     comment_text = scanner.ExtractTextFromJsDocComment(comment_match.group())
     comment = Comment(comment_text, comment_match.start(), comment_match.end())
-    
-    if identifier_match:
-      # TODO(nanaze): Identify scoped variables and expand identifiers.
-      identifier = scanner.StripWhitespace(identifier_match.group())
-      symbol = Symbol(identifier, identifier_match.start(), identifier_match.end())
 
-      symbol.source = source
-      symbol.comment = comment
-      source.symbols.add(symbol)
-    else:
+    if not identifier_match:
       assert not source.filecomment, '@fileoverview comment made more than once' 
       source.filecomment = comment
+      continue
+
+    # TODO(nanaze): Identify scoped variables and expand identifiers.
+    identifier = scanner.StripWhitespace(identifier_match.group())
+
+    # Ignore symbols that are not part of the provided namespace.
+    if not _IsSymbolPartOfProvidedNamespaces(identifier, source.provides):
+      logging.info('Skipping identifer. Not part of provided namespace. ' + identifier)
+      continue
+
+    symbol = Symbol(identifier, identifier_match.start(), identifier_match.end())
+    symbol.source = source
+    symbol.comment = comment
+    source.symbols.add(symbol)
+
 
   return source
 

@@ -48,10 +48,6 @@ def _MakeSymbolMap(symbols):
       logging.info('Skipping "this" identifier ' + identifier)
       continue
 
-    if not _IsClosurizedNamespaceIdentifier(identifier):
-      logging.info('Skipping non-closurized identifier ' + identifier)
-      continue
-
     if identifier in symbol_map:
       duplicate_symbol = symbol_map[identifier]
       raise DuplicateSymbolError(
@@ -61,15 +57,6 @@ def _MakeSymbolMap(symbols):
     symbol_map[identifier] = symbol
 
   return symbol_map
-
-# TODO(nanaze): Make this a flag.
-_CLOSURIZED_NAMESPACES = frozenset(['goog'])
-
-def _IsClosurizedNamespaceIdentifier(identifier):
-  parts = identifier.split('.')
-  namespace = parts[0]
-  return namespace in _CLOSURIZED_NAMESPACES
-
 
 class DuplicateSymbolError(Exception):
   pass
