@@ -31,6 +31,11 @@ goog.require('goog.string');
     identifier_match = scanner.FindNextIdentifer(match.string, match.end())
     self.assertEquals('goog.bar.baz', identifier_match.group())
 
+  def testFindWeirdIdentifier(self):
+    script = '     \n   \n $aa$.b$b.cc$   '
+    identifier_match = scanner.FindNextIdentifer(script)
+    self.assertEquals('$aa$.b$b.cc$', identifier_match.group())
+
   def testExtractText(self):
     script = """
 /**
