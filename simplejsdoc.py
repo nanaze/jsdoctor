@@ -36,8 +36,12 @@ def _GetSymbolsFromSources(sources):
     for symbol in s.symbols:
       yield symbol
 
+# TODO(nanaze): Make this a flag
+_DUPLICATE_SYMBOL_IS_ERROR = False
+
 def _MakeSymbolMap(symbols):
   symbol_map = {}
+
   for symbol in symbols:
     identifier = symbol.identifier
 
@@ -50,12 +54,16 @@ def _MakeSymbolMap(symbols):
 
     if identifier in symbol_map:
       duplicate_symbol = symbol_map[identifier]
-      raise DuplicateSymbolError(
-        'Symbol duplicated\n%s\n%s' %
-        (symbol, duplicate_symbol))
+      msg = 'Symbol duplicated\n%s\n%s' % (symbol, duplicate_symbol)
+      
+      if _DUPLICATE_SYMBOL_IS_ERROR:
+        raise DuplicateSymbolError(msg)
+      else:
+        logging.warning(msg)
+      continue
 
     symbol_map[identifier] = symbol
-
+  
   return symbol_map
 
 class DuplicateSymbolError(Exception):
@@ -76,8 +84,6 @@ def main():
 
   keys = symbol_map.keys()
   keys.sort()
-  for k in keys:
-    print keys
   
   
 if __name__ == '__main__':

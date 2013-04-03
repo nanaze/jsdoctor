@@ -52,10 +52,10 @@ def _IsSymbolPartOfProvidedNamespaces(symbol, provided_namespaces):
   return False
 
 def _IsIgnorableIdentifier(identifier_match):
-  remaining_string = identifier_match.string[identifier_match.end():]
 
-  # Find the first non-whitespace character.
-  match = re.search('[\S]', remaining_string)
+  # Find the first non-whitespace character after the identifier.
+  regex = re.compile('[\S]')
+  match = regex.search(identifier_match.string, pos=identifier_match.end())
   if match:
     first_character = match.group()
     if first_character in ['(', '[']:
@@ -84,6 +84,10 @@ def ScanScript(script, path=None):
     if _IsIgnorableIdentifier(identifier_match):
       # This is JsDoc on a method call, most likely a type cast of a return value.
       # Ignore.
+      continue
+
+    if identifier_match.group() == '(':
+      # This comment targeted a parenthetical and can be ignored.
       continue
 
     # TODO(nanaze): Identify scoped variables and expand identifiers.

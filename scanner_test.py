@@ -28,12 +28,12 @@ goog.require('goog.string');
 
   def testFindIdentifier(self):
     match = list(scanner.FindJsDocComments(_TEST_SCRIPT))[0]
-    identifier_match = scanner.FindNextIdentifer(match.string, match.end())
+    identifier_match = scanner.FindCommentTarget(match.string, match.end())
     self.assertEquals('goog.bar.baz', identifier_match.group())
 
   def testFindWeirdIdentifier(self):
     script = '     \n   \n $aa$.b$b.cc$   '
-    identifier_match = scanner.FindNextIdentifer(script)
+    identifier_match = scanner.FindCommentTarget(script)
     self.assertEquals('$aa$.b$b.cc$', identifier_match.group())
 
   def testExtractText(self):
@@ -99,9 +99,14 @@ qux =
 """
 
     match = list(scanner.FindJsDocComments(test_script))[0]
-    identifier_match = scanner.FindNextIdentifer(match.string, match.end())
+    identifier_match = scanner.FindCommentTarget(match.string, match.end())
     symbol = scanner.StripWhitespace(identifier_match.group())
     self.assertEquals('goog.bar.baz.qux', symbol)
+
+  def testCast(self):
+
+    identifier_match = scanner.FindCommentTarget('   (aaa)')
+    self.assertEquals('(', identifier_match.group())
 
 _TEST_SCRIPT = """\
 var = 2;

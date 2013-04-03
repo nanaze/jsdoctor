@@ -19,15 +19,15 @@ class SourceTestCase(unittest.TestCase):
     self.assertEquals('goog.aaa.bbb', symbol.identifier)
 
   def testIsIgnorableIdentifier(self):
-    match = scanner.FindNextIdentifer('  aaa.bbb = 3');
+    match = scanner.FindCommentTarget('  aaa.bbb = 3');
     self.assertEquals('aaa.bbb', match.group())
     self.assertFalse(source._IsIgnorableIdentifier(match))
 
-    match = scanner.FindNextIdentifer('  aaa.bbb(3)');
+    match = scanner.FindCommentTarget('  aaa.bbb(3)');
     self.assertEquals('aaa.bbb', match.group())
     self.assertTrue(source._IsIgnorableIdentifier(match))
 
-    match = scanner.FindNextIdentifer('  aaa.bbb[3])');
+    match = scanner.FindCommentTarget('  aaa.bbb[3])');
     self.assertEquals('aaa.bbb', match.group())
     self.assertTrue(source._IsIgnorableIdentifier(match))
     

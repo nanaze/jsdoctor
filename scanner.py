@@ -29,7 +29,7 @@ def ExtractDocumentedSymbols(script):
       # This is a file overview comment.
       pass
     else: 
-      identifier_match = FindNextIdentifer(script, comment_match.end())
+      identifier_match = FindCommentTarget(script, comment_match.end())
       if not identifier_match:
         raise NoIdentiferFoundError(
         'Found no identifier for comment: ' + identifier_match.group())
@@ -40,10 +40,10 @@ def ExtractDocumentedSymbols(script):
 def FindJsDocComments(script):
   return re.finditer('/\*\*.*?\*/', script, re.DOTALL)
 
-def FindNextIdentifer(script, pos=0):
-
+def FindCommentTarget(script, pos=0):
+  # Find an opening parethesis or an identifier.
   # \w and $ should cover all valid identifiers.
-  identifier_regex = re.compile('(?:[$\w]+\s*\.\s*)*[$\w]+')
+  identifier_regex = re.compile('\(|(?:[$\w]+\s*\.\s*)*[$\w]+')
   return identifier_regex.search(script, pos=pos)
 
 def StripWhitespace(original_string):
