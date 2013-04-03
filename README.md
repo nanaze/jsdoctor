@@ -1,7 +1,7 @@
 simplejsdoc
 ===========
 
-Simple Python tool to extract JSDoc from Closure-style codebases and prepare a API reference in HTML.
+Simple Python tool to extract Closure-style [JSDoc](http://en.wikipedia.org/wiki/JSDoc) from Closure-style codebases and prepare a API reference in HTML.
 
 Background
 ---
@@ -15,3 +15,13 @@ Other JsDoc systems _kind of_ work on Closure, but the flag/type syntax used by 
 
 I, [nanaze](http://github.com/nanaze), wanted to take a shot at doing this in a more lo-fi manner, possibly repurposing an exisiting parser like [Esprima](http://esprima.org/). But quick prototyping led me to extract JsDoc with regular
 expressions in Python which, though duct-tape-like, works surprisingly well and quickly.
+
+Current state
+---
+
+The tool is not done.  Enough is implemented at present to identify all JSDoc'd symbols in the current Closure codebase and extract the
+associated JSDoc comments.
+
+Left to do is the parsing of the comments, the combining of the symbols, and the rendering to HTML.
+
+If you'd like to contribute, let me know by sending an email.
