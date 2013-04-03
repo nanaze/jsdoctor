@@ -51,13 +51,15 @@ def _IsSymbolPartOfProvidedNamespaces(symbol, provided_namespaces):
       return True
   return False
 
-def _IsMethodCall(identifier_match):
+def _IsIgnorableIdentifier(identifier_match):
   remaining_string = identifier_match.string[identifier_match.end():]
-  match = re.search('[\S]', remaining_string)
 
+  # Find the first non-whitespace character.
+  match = re.search('[\S]', remaining_string)
   if match:
-    if match.group() == '(':
-      # This is the opening method call.
+    first_character = match.group()
+    if first_character in ['(', '[']:
+      # This is a method call or a bracket-notation property access. Ignore.
       return True
 
   return False
@@ -79,7 +81,7 @@ def ScanScript(script, path=None):
       source.filecomment = comment
       continue
 
-    if _IsMethodCall(identifier_match):
+    if _IsIgnorableIdentifier(identifier_match):
       # This is JsDoc on a method call, most likely a type cast of a return value.
       # Ignore.
       continue

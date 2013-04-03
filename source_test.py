@@ -18,14 +18,18 @@ class SourceTestCase(unittest.TestCase):
     self.assertEquals('Testing testing.', symbol.comment.text)
     self.assertEquals('goog.aaa.bbb', symbol.identifier)
 
-  def testIsMethodCall(self):
+  def testIsIgnorableIdentifier(self):
     match = scanner.FindNextIdentifer('  aaa.bbb = 3');
     self.assertEquals('aaa.bbb', match.group())
-    self.assertFalse(source._IsMethodCall(match))
+    self.assertFalse(source._IsIgnorableIdentifier(match))
 
     match = scanner.FindNextIdentifer('  aaa.bbb(3)');
     self.assertEquals('aaa.bbb', match.group())
-    self.assertTrue(source._IsMethodCall(match))
+    self.assertTrue(source._IsIgnorableIdentifier(match))
+
+    match = scanner.FindNextIdentifer('  aaa.bbb[3])');
+    self.assertEquals('aaa.bbb', match.group())
+    self.assertTrue(source._IsIgnorableIdentifier(match))
     
 _TEST_SCRIPT = """
 goog.provide('goog.aaa');
