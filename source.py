@@ -63,6 +63,9 @@ def _IsIgnorableIdentifier(identifier_match):
       return True
 
   return False
+  
+# TODO(nanaze): In the future this could farm out to a formal parser like
+# Esprima to correctly identify comments. Regexing seems to work OK for now.
 
 def ScanScript(script, path=None):
 
