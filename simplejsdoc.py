@@ -84,6 +84,11 @@ def main():
 
   keys = symbol_map.keys()
   keys.sort()
+  for key in keys:
+    symbol = symbol_map[key]
+    print symbol.identifier
+    print symbol.comment.text
+    
   
   
 if __name__ == '__main__':
