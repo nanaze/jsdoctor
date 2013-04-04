@@ -3,6 +3,17 @@ import unittest
 
 class NamespaceTestCase(unittest.TestCase):
 
+  def testNearestNamespace(self):
+    closest = namespace.GetClosestNamespaceForSymbol(
+      'aaa.bbb.ccc',
+      set(['aaa.bbb.ccc.ddd', 'aaa.bbb.ccc.eee']))
+    self.assertIsNone(closest)
+
+    closest = namespace.GetClosestNamespaceForSymbol(
+      'aaa.bbb.ccc',
+      set(['aaa.bbb', 'aaa.bbb.ccc.ddd']))
+    self.assertEquals('aaa.bbb', closest)
+
   def testGetNamespaceParts(self):
     self.assertEquals(
       ['goog', 'string', 'startsWith'],
