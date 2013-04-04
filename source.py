@@ -1,6 +1,7 @@
 import scanner
 import namespace
 import logging
+import jsdoc
 import re
 
 class Source(object):
@@ -44,6 +45,18 @@ class Comment(object):
     self.text = text
     self.start = start
     self.end = end
+    
+    self.description_sections, self.flags = _GetDescriptionAndFlags(text)
+    
+class Flag(object):
+  def __init__(self, name, text):
+    self.name = name
+    self.text = text
+
+def _GetDescriptionAndFlags(text):
+  description_sections, flag_pairs = jsdoc.ProcessComment(text)
+  flags = [Flag(name, text) for name, text in flag_pairs]
+  return description_sections, flags
 
 def _IsSymbolPartOfProvidedNamespaces(symbol, provided_namespaces):
   for ns in provided_namespaces:
@@ -64,15 +77,8 @@ def _IsIgnorableIdentifier(identifier_match):
 
   return False
 
-def ScanScript(script, path=None):
-
-  source = Source(script, path)
-  source.provides.update(set(scanner.YieldProvides(script)))
-  source.requires.update(set(scanner.YieldRequires(script)))
-
-  pairs = scanner.ExtractDocumentedSymbols(script)
-
-  for comment_match, identifier_match in pairs:
+def _YieldSymbols(match_pairs, provided_namespaces):
+  for comment_match, identifier_match in match_pairs:
     comment_text = scanner.ExtractTextFromJsDocComment(comment_match.group())
     comment = Comment(comment_text, comment_match.start(), comment_match.end())
 
@@ -98,15 +104,26 @@ def ScanScript(script, path=None):
       continue
 
     # Ignore symbols that are not part of the provided namespace.
-    if not _IsSymbolPartOfProvidedNamespaces(identifier, source.provides):
+    if not _IsSymbolPartOfProvidedNamespaces(identifier, provided_namespaces):
       logging.info('Skipping identifer. Not part of provided namespace. ' + identifier)
       continue
 
     symbol = Symbol(identifier, identifier_match.start(), identifier_match.end())
-    symbol.source = source
     symbol.comment = comment
-    source.symbols.add(symbol)
 
+    yield symbol
+  
+
+def ScanScript(script, path=None):
+
+  source = Source(script, path)
+  source.provides.update(set(scanner.YieldProvides(script)))
+  source.requires.update(set(scanner.YieldRequires(script)))
+
+  match_pairs = scanner.ExtractDocumentedSymbols(script)
+  for symbol in _YieldSymbols(match_pairs, source.provides):
+    symbol.source = source
+    source.symbols.add(symbol)
 
   return source
 
