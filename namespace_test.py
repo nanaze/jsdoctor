@@ -3,6 +3,12 @@ import unittest
 
 class NamespaceTestCase(unittest.TestCase):
 
+  def testPrototypeProperty(self):
+    self.assertTrue(namespace.IsPrototypeProperty('foo.prototype.yes'))
+    self.assertFalse(namespace.IsPrototypeProperty('foo.prototype.yes.no'))
+    self.assertFalse(namespace.IsPrototypeProperty('foo.prototype.yes.no'))
+    self.assertFalse(namespace.IsPrototypeProperty('foo.bar.baz'))
+
   def testNearestNamespace(self):
     closest = namespace.GetClosestNamespaceForSymbol(
       'aaa.bbb.ccc',

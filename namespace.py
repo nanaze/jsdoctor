@@ -1,3 +1,10 @@
+def IsPrototypeProperty(namespace):
+  parts = GetNamespaceParts(namespace)
+  return len(parts) >= 3 and parts[-2] == 'prototype'
+
+def GetNamesapceFromParts(parts):
+  return '.'.join(parts)
+
 def GetNamespaceParts(namespace):
   # TODO(nanaze): Memoize. This is idempotent and hit a lot.
   return namespace.split('.')
