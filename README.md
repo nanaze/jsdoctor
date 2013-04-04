@@ -16,6 +16,15 @@ Other JsDoc systems _kind of_ work on Closure, but the flag/type syntax used by 
 I, [nanaze](http://github.com/nanaze), wanted to take a shot at doing this in a more lo-fi manner, possibly repurposing an exisiting parser like [Esprima](http://esprima.org/). But quick prototyping led me to extract JsDoc with regular
 expressions in Python which, though duct-tape-like, works surprisingly well and quickly.
 
+Design Goals and Guidlines
+---
+
+These are explicit decisions made to keep the codebase small and simple:
+
+  * Support Closure-style JSDoc. And that's it -- no generalization for different JSDoc dialects for the sake
+  * Fail fast with errors, not warnings -- if parser or doc generator sees a problem, it pukes, as there's something
+    with your code.  Writing a test to verify that docs build on each checkin/commit is encouraged.
+
 Current state
 ---
 
