@@ -16,6 +16,7 @@ class SourceTestCase(unittest.TestCase):
 
     symbol = list(test_source.symbols)[0]
     self.assertEquals('goog.aaa.bbb', symbol.identifier)
+    self.assertEquals('goog.aaa', symbol.namespace)    
 
     comment = symbol.comment
     self.assertEquals('Testing testing.\n@cat Dog.', comment.text)
@@ -27,7 +28,6 @@ class SourceTestCase(unittest.TestCase):
     flag = comment.flags[0]
     self.assertEquals('@cat', flag.name)
     self.assertEquals('Dog.', flag.text)
-
 
   def testIsIgnorableIdentifier(self):
     match = scanner.FindCommentTarget('  aaa.bbb = 3');

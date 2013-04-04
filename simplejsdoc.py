@@ -80,15 +80,12 @@ def main():
   # This can be parallelized if needed.
   sources = [_ScanPath(path) for path in paths]
   symbols = _GetSymbolsFromSources(sources)
+
+  # This could instead be just a dupe check
   symbol_map = _MakeSymbolMap(symbols)
 
-  keys = symbol_map.keys()
-  keys.sort()
-  for key in keys:
-    symbol = symbol_map[key]
-    print symbol.identifier
-    print symbol.comment.text
-    
+  symbols = symbol_map.values()
+
   
   
 if __name__ == '__main__':

@@ -29,6 +29,7 @@ class Symbol(object):
     self.end = end
     self.source = None
     self.comment = None
+    self.namespace = None
 
   def __str__(self):
     symbol_string = super(Symbol, self).__str__()
@@ -76,6 +77,9 @@ def _IsIgnorableIdentifier(identifier_match):
       return True
 
   return False
+
+class NamespaceNotFoundError(Exception):
+  pass
   
 # TODO(nanaze): In the future this could farm out to a formal parser like
 # Esprima to correctly identify comments. Regexing seems to work OK for now.
@@ -114,6 +118,15 @@ def _YieldSymbols(match_pairs, provided_namespaces):
     symbol = Symbol(identifier, identifier_match.start(), identifier_match.end())
     symbol.comment = comment
 
+    # Identify the namespace for this symbol.
+    closest_namespace = namespace.GetClosestNamespaceForSymbol(
+        identifier, provided_namespaces)
+
+    if not closest_namespace:
+      raise NamespaceNotFoundError('No namespace found ' + identifier)
+
+    symbol.namespace = closest_namespace
+    
     yield symbol
   
 
