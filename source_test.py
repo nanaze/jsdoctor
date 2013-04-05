@@ -19,15 +19,15 @@ class SourceTestCase(unittest.TestCase):
     self.assertEquals('goog.aaa', symbol.namespace)    
 
     comment = symbol.comment
-    self.assertEquals('Testing testing.\n@cat Dog.', comment.text)
+    self.assertEquals('Testing testing.\n@return {string} Dog.', comment.text)
 
     self.assertEquals(['Testing testing.'], comment.description_sections)
 
     self.assertEquals(1, len(comment.flags))
 
     flag = comment.flags[0]
-    self.assertEquals('@cat', flag.name)
-    self.assertEquals('Dog.', flag.text)
+    self.assertEquals('@return', flag.name)
+    self.assertEquals('{string} Dog.', flag.text)
 
   def testIsIgnorableIdentifier(self):
     match = scanner.FindCommentTarget('  aaa.bbb = 3');
@@ -51,7 +51,7 @@ goog.require('goog.ddd');
 
 /**
  * Testing testing.
- * @cat Dog.
+ * @return {string} Dog.
  */
 goog.aaa.bbb;
 """

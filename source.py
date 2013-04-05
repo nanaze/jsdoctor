@@ -2,6 +2,7 @@ import scanner
 import namespace
 import logging
 import jsdoc
+import flags
 import re
 
 class Source(object):
@@ -51,6 +52,9 @@ class Comment(object):
     
 class Flag(object):
   def __init__(self, name, text):
+
+    assert name in flags.ALL_FLAGS, 'Unrecognized flag: ' + name
+    
     self.name = name
     self.text = text
 
