@@ -4,6 +4,7 @@ import collections
 import logging
 import sys
 import os
+import multiprocessing
 import source
 
 def _ScanPath(path):
@@ -77,16 +78,20 @@ def _MakeNamespaceMap(symbols):
     namespace_map[symbol.namespace].add(symbol)
   return namespace_map
 
+def _ScanPathsInParallel(paths):
+  pool = multiprocessing.Pool(4 * multiprocessing.cpu_count())
+  return pool.imap(_ScanPath, paths)
+
 def main():
   logging.basicConfig(
       level=logging.INFO,
       format='%(levelname)s:%(module)s:%(lineno)d: %(message)s')
 
   paths = sys.argv[1:]
-  paths = [path for path in paths if _ShouldScanPath(path)]
+  paths = (path for path in paths if _ShouldScanPath(path))
 
   # This can be parallelized if needed.
-  sources = [_ScanPath(path) for path in paths]
+  sources = _ScanPathsInParallel(paths)
   symbols = _GetSymbolsFromSources(sources)
 
   # This could instead be just a dupe check
