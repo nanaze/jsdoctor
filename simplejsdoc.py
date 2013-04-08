@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import collections
 import logging
 import sys
 import os
@@ -69,6 +70,13 @@ def _MakeSymbolMap(symbols):
 class DuplicateSymbolError(Exception):
   pass
 
+
+def _MakeNamespaceMap(symbols):
+  namespace_map = collections.defaultdict(set)
+  for symbol in symbols:
+    namespace_map[symbol.namespace].add(symbol)
+  return namespace_map
+
 def main():
   logging.basicConfig(
       level=logging.INFO,
@@ -85,6 +93,10 @@ def main():
   symbol_map = _MakeSymbolMap(symbols)
 
   symbols = symbol_map.values()
+
+  namespace_map = _MakeNamespaceMap(symbols)
+
+  
 
   
   
