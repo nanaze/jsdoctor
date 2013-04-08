@@ -31,6 +31,7 @@ class Symbol(object):
     self.source = None
     self.comment = None
     self.namespace = None
+    self.property = None
 
   def __str__(self):
     symbol_string = super(Symbol, self).__str__()
@@ -130,6 +131,10 @@ def _YieldSymbols(match_pairs, provided_namespaces):
       raise NamespaceNotFoundError('No namespace found ' + identifier)
 
     symbol.namespace = closest_namespace
+
+    # Note the property name
+    if namespace.IsPrototypeProperty(identifier):
+      symbol.property = namespace.GetPrototypeProperty(identifier)
     
     yield symbol
   

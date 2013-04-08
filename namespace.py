@@ -9,6 +9,11 @@ def GetNamespaceParts(namespace):
   # TODO(nanaze): Memoize. This is idempotent and hit a lot.
   return namespace.split('.')
 
+def GetPrototypeProperty(namespace):
+  assert IsPrototypeProperty(namespace)
+  parts = namespace.split('.')
+  return parts[-1]
+
 def IsSymbolPartOfNamespace(symbol, namespace):
   namespace_parts = GetNamespaceParts(namespace)
   symbol_parts = GetNamespaceParts(symbol)

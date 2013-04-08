@@ -41,6 +41,18 @@ class SourceTestCase(unittest.TestCase):
     match = scanner.FindCommentTarget('  aaa.bbb[3])');
     self.assertEquals('aaa.bbb', match.group())
     self.assertTrue(source._IsIgnorableIdentifier(match))
+
+  def testScanPrototypeProperty(self):
+    test_source = source.ScanScript("""\
+goog.provide('abc.Def');
+
+/**
+ * Test.
+ */
+abc.Def.prototype.ghi;
+""")
+    symbol = list(test_source.symbols)[0]
+    self.assertEquals('ghi', symbol.property)
     
 _TEST_SCRIPT = """
 goog.provide('goog.aaa');

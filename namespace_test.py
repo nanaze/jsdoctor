@@ -41,6 +41,11 @@ class NamespaceTestCase(unittest.TestCase):
         'aaa.bbb.foo',
         'aaa.bbb.foo'))
 
+  def testGetPrototypeProperty(self):
+    self.assertEquals(
+      'foo', namespace.GetPrototypeProperty('bar.prototype.foo'))
+    self.assertRaises(lambda: namespace.GetPrototypeProperty('bar'))
+
 
 if __name__ == '__main__':
     unittest.main()
