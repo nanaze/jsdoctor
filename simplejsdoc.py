@@ -6,6 +6,7 @@ import sys
 import os
 import multiprocessing
 import source
+import generator
 
 def _ScanPath(path):
   logging.info('Scanning source %s' % path)
@@ -79,7 +80,7 @@ def _MakeNamespaceMap(symbols):
   return namespace_map
 
 def _ScanPathsInParallel(paths):
-  pool = multiprocessing.Pool(4 * multiprocessing.cpu_count())
+  pool = multiprocessing.Pool(8 * multiprocessing.cpu_count())
   return pool.imap(_ScanPath, paths)
 
 def main():
@@ -98,8 +99,11 @@ def main():
   symbol_map = _MakeSymbolMap(symbols)
 
   symbols = symbol_map.values()
-
+  
   namespace_map = _MakeNamespaceMap(symbols)
+
+  generator.GenerateDocs(namespace_map)
+  
 
   
 
