@@ -6,7 +6,10 @@ import sys
 import os
 import multiprocessing
 import source
+import argparse
 import generator
+import StringIO
+import tarfile
 
 def _ScanPath(path):
   logging.info('Scanning source %s' % path)
@@ -83,12 +86,21 @@ def _ScanPathsInParallel(paths):
   pool = multiprocessing.Pool(8 * multiprocessing.cpu_count())
   return pool.imap(_ScanPath, paths)
 
+def _ParseArgs():
+  parser = argparse.ArgumentParser(description='Generates HTML docs for JsDoc')
+  parser.add_argument('--tar', help='Path to tar file', required=True)
+  parser.add_argument('files', help='Paths to files', nargs='*')
+  return parser.parse_args()
+
 def main():
   logging.basicConfig(
       level=logging.INFO,
       format='%(levelname)s:%(module)s:%(lineno)d: %(message)s')
 
-  paths = sys.argv[1:]
+  result = _ParseArgs()
+  tar_path = result.tar
+  
+  paths = result.files
   paths = (path for path in paths if _ShouldScanPath(path))
 
   # This can be parallelized if needed.
@@ -102,12 +114,17 @@ def main():
   
   namespace_map = _MakeNamespaceMap(symbols)
 
-  generator.GenerateDocs(namespace_map)
-  
+  logging.info('Writing to tar: %s', tar_path)
+  with tarfile.open(name=tar_path, mode='w') as tar:
+    for path, content in generator.GenerateDocs(namespace_map):
+      logging.info('Writing doc to tar: %s', path)
+      # Add each path to the tar
+      info = tarfile.TarInfo(name=path)
+      info.size = len(content)
+      buf = StringIO.StringIO(content)
+      tar.addfile(info, buf)
+  logging.info('Tar written to %s', tar_path)
 
-  
-
-  
-  
+    
 if __name__ == '__main__':
   main()

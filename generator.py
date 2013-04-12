@@ -1,16 +1,12 @@
 from xml.dom import minidom
 
 def GenerateDocs(namespace_map):
-
-  content = {}
-
   for namespace, symbols in namespace_map.iteritems():
     filepath = '%s.html' % namespace
     doc = _GenerateDocument(namespace, symbols)
-    xml_str = doc.documentElement.toprettyxml(indent='  ')
-    content[filepath] = xml_str
-  
-  return content
+    content = doc.documentElement.toprettyxml(indent='  ')
+    yield filepath, content
+
 
 def _MakeTextNode(content):
   text = minidom.Text()
