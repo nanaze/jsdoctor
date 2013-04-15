@@ -1,5 +1,7 @@
 from xml.dom import minidom
 
+import symboltypes
+
 def GenerateDocs(namespace_map):
   for namespace, symbols in namespace_map.iteritems():
     filepath = '%s.html' % namespace
@@ -12,6 +14,20 @@ def _MakeTextNode(content):
   text = minidom.Text()
   text.data = content
   return text
+
+def _MakeHeader(content=None):
+  return _MakeElement('h2', content)
+
+def _MakeElement(tagname, content=None):
+  element = minidom.Element(tagname)
+
+  if content:
+    element.appendChild(_MakeTextNode(content))
+  
+  return element
+
+def _GetSymbolsOfType(symbols, type):
+  return [symbol for symbol in symbols if symbol.type == type]
 
 def _GenerateDocument(namespace, symbols):
   doc = minidom.getDOMImplementation().createDocument(None, 'html', None)
@@ -29,15 +45,30 @@ def _GenerateContent(namespace, symbols):
   node_list = minidom.NodeList()
 
   sorted_symbols = sorted(symbols, key= lambda symbol: symbol.identifier)
-  for symbol in sorted_symbols:
-    header = minidom.Element('h2')
-    header.appendChild(_MakeTextNode(symbol.identifier))
-    node_list.append(header)
 
-    comment = minidom.Element('p')
-    comment.appendChild(_MakeTextNode(symbol.comment.text))
-    node_list.append(comment)
+  # Constructor
+  constructor_symbols = _GetSymbolsOfType(
+    sorted_symbols, symboltypes.CONSTRUCTOR)
 
+  if constructor_symbols:
+    node_list.append(_MakeElement('h2', 'Constructor'))
+
+    for symbol in constructor_symbols:
+      node_list.append(_MakeElement('h3', symbol.identifier))
+      for section in symbol.comment.description_sections:
+        node_list.append(_MakeElement('p', section))
+
+  # Interface
+  interface_symbols = _GetSymbolsOfType(
+    sorted_symbols, symboltypes.INTERFACE)
+        
+  if interface_symbols:
+    node_list.append(_MakeElement('h2', 'Interface'))
+
+    for symbol in interface_symbols:
+      node_list.append(_MakeElement('h3', symbol.identifier))
+      for section in symbol.comment.description_sections:
+        node_list.append(_MakeElement('p', section))        
 
   return node_list
 
