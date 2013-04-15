@@ -9,7 +9,6 @@ def GenerateDocs(namespace_map):
     content = doc.documentElement.toprettyxml(indent='  ')
     yield filepath, content
 
-
 def _MakeTextNode(content):
   text = minidom.Text()
   text.data = content
@@ -26,6 +25,9 @@ def _MakeElement(tagname, content=None):
   
   return element
 
+def _IsStatic(symbol):
+  return bool(symbol.static)
+
 def _GetSymbolsOfType(symbols, type):
   return [symbol for symbol in symbols if symbol.type == type]
 
@@ -40,6 +42,12 @@ def _GenerateDocument(namespace, symbols):
     
   return doc
 
+def _AddSymbolDescriptions(node_list, symbols):
+  for symbol in symbols:
+    node_list.append(_MakeElement('h3', symbol.identifier))
+    for section in symbol.comment.description_sections:
+      node_list.append(_MakeElement('p', section))  
+
 def _GenerateContent(namespace, symbols):
 
   node_list = minidom.NodeList()
@@ -52,11 +60,7 @@ def _GenerateContent(namespace, symbols):
 
   if constructor_symbols:
     node_list.append(_MakeElement('h2', 'Constructor'))
-
-    for symbol in constructor_symbols:
-      node_list.append(_MakeElement('h3', symbol.identifier))
-      for section in symbol.comment.description_sections:
-        node_list.append(_MakeElement('p', section))
+    _AddSymbolDescriptions(node_list, constructor_symbols)
 
   # Interface
   interface_symbols = _GetSymbolsOfType(
@@ -64,11 +68,14 @@ def _GenerateContent(namespace, symbols):
         
   if interface_symbols:
     node_list.append(_MakeElement('h2', 'Interface'))
+    _AddSymbolDescriptions(node_list, interface_symbols)
 
-    for symbol in interface_symbols:
-      node_list.append(_MakeElement('h3', symbol.identifier))
-      for section in symbol.comment.description_sections:
-        node_list.append(_MakeElement('p', section))        
+  # Enumerations
+  enum_symbols = _GetSymbolsOfType(
+     sorted_symbols, symboltypes.ENUM)
+  if enum_symbols:
+    node_list.append(_MakeElement('h2', 'Enumerations'))
+    _AddSymbolDescriptions(node_list, enum_symbols)
 
   return node_list
 
