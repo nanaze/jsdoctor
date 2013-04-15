@@ -31,6 +31,11 @@ Current state
 The tool is not done.  Enough is implemented at present to identify all JSDoc'd symbols in the current Closure codebase and extract the
 associated JSDoc comments.
 
-Left to do is the parsing of the comments, the combining of the symbols, and the rendering to HTML.
+Right now, the tool can do mimimal rendering to HTML.  The following needs to be implemented:
+
+* Rendering of functions.
+* Inheritance
+* "this.foo" properties
+* lots more
 
 If you'd like to contribute, let me know by sending an email.
