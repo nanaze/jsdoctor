@@ -1,4 +1,4 @@
-simplejsdoc
+jsdoctor
 ===========
 
 Simple Python tool to extract Closure-style [JSDoc](http://en.wikipedia.org/wiki/JSDoc) from Closure-style codebases and prepare a API reference in HTML.
