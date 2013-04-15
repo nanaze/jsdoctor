@@ -28,6 +28,9 @@ def _MakeElement(tagname, content=None):
 def _IsStatic(symbol):
   return bool(symbol.static)
 
+def _IsNotStatic(symbol):
+  return not _IsStatic(symbol)
+
 def _GetSymbolsOfType(symbols, type):
   return [symbol for symbol in symbols if symbol.type == type]
 
@@ -76,6 +79,18 @@ def _GenerateContent(namespace, symbols):
   if enum_symbols:
     node_list.append(_MakeElement('h2', 'Enumerations'))
     _AddSymbolDescriptions(node_list, enum_symbols)
+
+  instance_methods = filter(_IsNotStatic,
+      _GetSymbolsOfType(sorted_symbols, symboltypes.FUNCTION))
+  if instance_methods:
+    node_list.append(_MakeElement('h2', 'Instance methods'))
+    _AddSymbolDescriptions(node_list, instance_methods)
+
+  instance_properties = filter(_IsNotStatic,
+      _GetSymbolsOfType(sorted_symbols, symboltypes.PROPERTY))
+  if instance_properties:
+    node_list.append(_MakeElement('h2', 'Instance properties'))
+    _AddSymbolDescriptions(node_list, instance_properties)      
 
   static_functions = filter(_IsStatic,
       _GetSymbolsOfType(sorted_symbols, symboltypes.FUNCTION))
