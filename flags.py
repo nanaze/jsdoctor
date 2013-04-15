@@ -10,7 +10,7 @@ FILE_FLAGS = frozenset([
     '@author',
     '@fileoverview',
     '@see',
-    '@license'
+    '@license',
     '@visibility'
     ])
 
