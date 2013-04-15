@@ -17,6 +17,7 @@ class SourceTestCase(unittest.TestCase):
 
     symbol = list(test_source.symbols)[0]
     self.assertEquals('goog.aaa.bbb', symbol.identifier)
+    self.assertTrue(symbol.static)
     self.assertEquals('goog.aaa', symbol.namespace)
     self.assertEquals(symboltypes.FUNCTION, symbol.type)    
 
@@ -55,6 +56,7 @@ abc.Def.prototype.ghi;
 """)
     symbol = list(test_source.symbols)[0]
     self.assertEquals('ghi', symbol.property)
+    self.assertFalse(symbol.static)
     
 _TEST_SCRIPT = """
 goog.provide('goog.aaa');

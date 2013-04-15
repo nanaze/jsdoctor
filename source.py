@@ -117,6 +117,7 @@ def _YieldSymbols(match_pairs, provided_namespaces):
     # TODO(nanaze): Identify scoped variables and expand identifiers.
     identifier = scanner.StripWhitespace(identifier_match.group())
 
+    # TODO(nanaze): catch this. properties, make sure not static
     if identifier.startswith('this.'):
       logging.info('Skipping identifer. Ignoring "this." properties for now. ' + identifier)
       continue
@@ -144,7 +145,10 @@ def _YieldSymbols(match_pairs, provided_namespaces):
     # Note the property name
     if namespace.IsPrototypeProperty(identifier):
       symbol.property = namespace.GetPrototypeProperty(identifier)
-    
+      symbol.static = False
+    else:
+      symbol.static = True
+      
     yield symbol
   
 
