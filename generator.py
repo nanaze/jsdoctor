@@ -77,6 +77,20 @@ def _GenerateContent(namespace, symbols):
     node_list.append(_MakeElement('h2', 'Enumerations'))
     _AddSymbolDescriptions(node_list, enum_symbols)
 
+  static_functions = filter(_IsStatic,
+      _GetSymbolsOfType(sorted_symbols, symboltypes.FUNCTION))
+  if static_functions:
+    node_list.append(_MakeElement('h2', 'Static methods'))
+    _AddSymbolDescriptions(node_list, static_functions)  
+
+  static_properties = filter(_IsStatic,
+      _GetSymbolsOfType(sorted_symbols, symboltypes.PROPERTY))
+  if static_properties:
+    node_list.append(_MakeElement('h2', 'Static properties'))
+    _AddSymbolDescriptions(node_list, static_properties)      
+    
+  
+
   return node_list
 
 
