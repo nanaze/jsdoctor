@@ -11,6 +11,7 @@ FILE_FLAGS = frozenset([
     '@fileoverview',
     '@see',
     '@license'
+    '@visibility'
     ])
 
 FUNCTION_FLAGS = frozenset([
