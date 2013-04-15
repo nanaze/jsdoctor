@@ -4,6 +4,7 @@ import logging
 import jsdoc
 import flags
 import re
+import symboltypes
 
 class Source(object):
   def __init__(self, script, path=None):
@@ -32,6 +33,7 @@ class Symbol(object):
     self.comment = None
     self.namespace = None
     self.property = None
+    self.type = None
 
   def __str__(self):
     symbol_string = super(Symbol, self).__str__()
@@ -45,11 +47,15 @@ class Symbol(object):
 
 class Comment(object):
   def __init__(self, text, start, end):
+
     self.text = text
     self.start = start
     self.end = end
-    
-    self.description_sections, self.flags = _GetDescriptionAndFlags(text)
+
+    description_sections, flags = _GetDescriptionAndFlags(text)
+    self.description_sections = description_sections
+    self.flags = flags
+
     
 class Flag(object):
   def __init__(self, name, text):
@@ -122,6 +128,9 @@ def _YieldSymbols(match_pairs, provided_namespaces):
 
     symbol = Symbol(identifier, identifier_match.start(), identifier_match.end())
     symbol.comment = comment
+
+    # Determine symbol type
+    symbol.type = symboltypes.DetermineSymbolType(symbol)
 
     # Identify the namespace for this symbol.
     closest_namespace = namespace.GetClosestNamespaceForSymbol(

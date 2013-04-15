@@ -1,6 +1,7 @@
 import scanner
 import source
 import unittest
+import symboltypes
 
 class SourceTestCase(unittest.TestCase):
 
@@ -16,7 +17,8 @@ class SourceTestCase(unittest.TestCase):
 
     symbol = list(test_source.symbols)[0]
     self.assertEquals('goog.aaa.bbb', symbol.identifier)
-    self.assertEquals('goog.aaa', symbol.namespace)    
+    self.assertEquals('goog.aaa', symbol.namespace)
+    self.assertEquals(symboltypes.FUNCTION, symbol.type)    
 
     comment = symbol.comment
     self.assertEquals('Testing testing.\n@return {string} Dog.', comment.text)
