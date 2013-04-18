@@ -56,13 +56,8 @@ def _MakeLink(text, href):
   a.setAttribute('href', href)
   return a
 
-def _MakeFunctionSummary(function):
+def _MakeFunctionSummary(name, function):
   container = _MakeElement('p')
-
-  name = function.identifier
-  if function.property:
-    name = function.property
-  
   container.appendChild(_MakeLink(name, '#' + name))
   return container
   
@@ -103,12 +98,12 @@ def _GenerateContent(namespace, symbols):
   if instance_methods:
     node_list.append(_MakeElement('h2', 'Method summary'))
     for method in instance_methods:
-      node_list.append(_MakeFunctionSummary(method))
+      node_list.append(_MakeFunctionSummary(method.property, method))
 
   if static_functions:
     node_list.append(_MakeElement('h2', 'Static methods'))
     for function in static_functions:
-      node_list.append(_MakeFunctionSummary(function))      
+      node_list.append(_MakeFunctionSummary(function.identifier, function))      
 
   # Enumerations
   enum_symbols = _GetSymbolsOfType(
