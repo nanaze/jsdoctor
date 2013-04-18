@@ -49,11 +49,29 @@ def _AddSymbolDescriptions(node_list, symbols):
   for symbol in symbols:
     node_list.append(_MakeElement('h3', symbol.identifier))
     for section in symbol.comment.description_sections:
-      node_list.append(_MakeElement('p', section))  
+      node_list.append(_MakeElement('p', section))
+
+def _MakeLink(text, href):
+  a = _MakeElement('a', text)
+  a.setAttribute('href', href)
+  return a
+
+def _MakeFunctionSummary(function):
+  container = _MakeElement('p')
+
+  name = function.identifier
+  if function.property:
+    name = function.property
+  
+  container.appendChild(_MakeLink(name, '#' + name))
+  return container
+  
 
 def _GenerateContent(namespace, symbols):
 
   node_list = minidom.NodeList()
+
+  node_list.append(_MakeElement('h1', namespace))
 
   sorted_symbols = sorted(symbols, key= lambda symbol: symbol.identifier)
 
@@ -73,27 +91,41 @@ def _GenerateContent(namespace, symbols):
     node_list.append(_MakeElement('h2', 'Interface'))
     _AddSymbolDescriptions(node_list, interface_symbols)
 
+  instance_methods = filter(_IsNotStatic,
+      _GetSymbolsOfType(sorted_symbols, symboltypes.FUNCTION))
+
+  instance_properties = filter(_IsNotStatic,
+      _GetSymbolsOfType(sorted_symbols, symboltypes.PROPERTY))
+
+  static_functions = filter(_IsStatic,
+      _GetSymbolsOfType(sorted_symbols, symboltypes.FUNCTION))
+
+  if instance_methods:
+    node_list.append(_MakeElement('h2', 'Method summary'))
+    for method in instance_methods:
+      node_list.append(_MakeFunctionSummary(method))
+
+  if static_functions:
+    node_list.append(_MakeElement('h2', 'Static methods'))
+    for function in static_functions:
+      node_list.append(_MakeFunctionSummary(function))      
+
   # Enumerations
   enum_symbols = _GetSymbolsOfType(
      sorted_symbols, symboltypes.ENUM)
+  
   if enum_symbols:
     node_list.append(_MakeElement('h2', 'Enumerations'))
     _AddSymbolDescriptions(node_list, enum_symbols)
 
-  instance_methods = filter(_IsNotStatic,
-      _GetSymbolsOfType(sorted_symbols, symboltypes.FUNCTION))
   if instance_methods:
     node_list.append(_MakeElement('h2', 'Instance methods'))
     _AddSymbolDescriptions(node_list, instance_methods)
 
-  instance_properties = filter(_IsNotStatic,
-      _GetSymbolsOfType(sorted_symbols, symboltypes.PROPERTY))
   if instance_properties:
     node_list.append(_MakeElement('h2', 'Instance properties'))
     _AddSymbolDescriptions(node_list, instance_properties)      
 
-  static_functions = filter(_IsStatic,
-      _GetSymbolsOfType(sorted_symbols, symboltypes.FUNCTION))
   if static_functions:
     node_list.append(_MakeElement('h2', 'Static methods'))
     _AddSymbolDescriptions(node_list, static_functions)  
@@ -103,8 +135,6 @@ def _GenerateContent(namespace, symbols):
   if static_properties:
     node_list.append(_MakeElement('h2', 'Static properties'))
     _AddSymbolDescriptions(node_list, static_properties)      
-    
-  
 
   return node_list
 
