@@ -61,14 +61,35 @@ def _MakeFunctionSummary(name, function):
   container = _MakeElement('p')
   container.appendChild(_MakeLink(name, '#' + name))
   container.appendChild(_MakeTextNode('('))
-  for flag in function.comment.flags:
-    if flag.name == '@param':
-      name, type, _ = flags.ParseParameterDescription(flag.text)
-      container.appendChild(_MakeTextNode('{%s}' % type))
-      container.appendChild(_MakeTextNode(' '))
-      container.appendChild(_MakeTextNode(name))
-  
+
+  param_flags = filter(lambda flag: flag.name == '@param',
+                       function.comment.flags)
+
+  for index, flag in enumerate(param_flags):
+    name, type, _ = flags.ParseParameterDescription(flag.text)
+
+    container.appendChild(_MakeTextNode('{%s}' % type))
+    container.appendChild(_MakeTextNode(' '))
+    container.appendChild(_MakeTextNode(name))
+
+    # If this is not the last param, add a comma
+    last_index = (len(param_flags) - 1)
+    if index != last_index:
+      container.appendChild(_MakeTextNode(', '))
+
   container.appendChild(_MakeTextNode(')'))
+  
+  return_flags = filter(lambda flag: flag.name == '@return',
+                        function.comment.flags)
+
+  assert(len(return_flags) <= 1, 'There should not be more than one @return flag.')
+
+  if return_flags:
+    return_flag = return_flags[0]
+    container.appendChild(_MakeTextNode(' : '))
+    type, _ = flags.ParseReturnDescription(return_flag.text)
+    container.appendChild(_MakeTextNode('{%s}' % type))
+    
   return container
   
 
