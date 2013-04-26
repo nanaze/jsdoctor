@@ -88,7 +88,7 @@ ALL_FLAGS = frozenset(all_flags)
 
 
 def ParseParameterDescription(desc):
-  match = re.match(r'^\s*(?P<name>\w+)\s+\{(?P<type>.*?)\}(?P<desc>.*)$', desc, re.DOTALL | re.MULTILINE)
+  match = re.match(r'^\s*\{(?P<type>.*?)\}\s+(?P<name>\w+)\s+(?P<desc>.*)$', desc, re.DOTALL | re.MULTILINE)
   if not match:
     raise ValueError('Could not parse flag description: %s' % desc)
   return (match.group('name').strip(),

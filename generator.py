@@ -1,6 +1,7 @@
 from xml.dom import minidom
 
 import symboltypes
+import flags
 
 def GenerateDocs(namespace_map):
   for namespace, symbols in namespace_map.iteritems():
@@ -60,6 +61,13 @@ def _MakeFunctionSummary(name, function):
   container = _MakeElement('p')
   container.appendChild(_MakeLink(name, '#' + name))
   container.appendChild(_MakeTextNode('('))
+  for flag in function.comment.flags:
+    if flag.name == '@param':
+      name, type, _ = flags.ParseParameterDescription(flag.text)
+      container.appendChild(_MakeTextNode(type))
+      container.appendChild(_MakeTextNode(' '))
+      container.appendChild(_MakeTextNode(name))
+  
   container.appendChild(_MakeTextNode(')'))
   return container
   

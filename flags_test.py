@@ -7,9 +7,14 @@ class FlagTestCase(unittest.TestCase):
 
   def testParseParamDescription(self):
 
-    desc = 'aaa {!bbb|ccc?} This \nis the desc.  '
+    desc = '{!bbb|ccc?} aaa This \nis the desc.  '
     self.assertEquals(
       ('aaa', '!bbb|ccc?', 'This \nis the desc.'),
+      flags.ParseParameterDescription(desc))
+
+    desc = '{...*} var_args The items to substitute into the pattern.'
+    self.assertEquals(
+      ('var_args', '...*', 'The items to substitute into the pattern.'),
       flags.ParseParameterDescription(desc))
 
     self.assertRaises(
