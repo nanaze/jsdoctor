@@ -59,6 +59,8 @@ def _MakeLink(text, href):
 def _MakeFunctionSummary(name, function):
   container = _MakeElement('p')
   container.appendChild(_MakeLink(name, '#' + name))
+  container.appendChild(_MakeTextNode('('))
+  container.appendChild(_MakeTextNode(')'))
   return container
   
 
