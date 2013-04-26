@@ -1,5 +1,7 @@
 from xml.dom import minidom
 
+import html5lib
+
 import symboltypes
 import flags
 
@@ -7,8 +9,11 @@ def GenerateDocs(namespace_map):
   for namespace, symbols in namespace_map.iteritems():
     filepath = '%s.html' % namespace
     doc = _GenerateDocument(namespace, symbols)
-    content = doc.documentElement.toxml()
+    content = doc.documentElement.toxml('utf-8')
     yield filepath, content
+
+def _ParseDocumentFragment(content):
+  return html5lib.parseFragment(content, treebuilder='dom')
 
 def _MakeTextNode(content):
   text = minidom.Text()
@@ -50,7 +55,10 @@ def _AddSymbolDescriptions(node_list, symbols):
   for symbol in symbols:
     node_list.append(_MakeElement('h3', symbol.identifier))
     for section in symbol.comment.description_sections:
-      node_list.append(_MakeElement('p', section))
+      elem = _ParseDocumentFragment(section)
+      p = _MakeElement('p')
+      node_list.append(p)
+      p.appendChild(elem)
 
 def _MakeLink(text, href):
   a = _MakeElement('a', text)
@@ -93,7 +101,7 @@ def _MakeFunctionSummary(name, function):
   if function.comment.description_sections:
     desc = function.comment.description_sections[0]
     container.appendChild(_MakeElement('br'))
-    container.appendChild(_MakeTextNode(desc))
+    container.appendChild(_ParseDocumentFragment(desc))
     
   return container
   
