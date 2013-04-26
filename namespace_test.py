@@ -20,6 +20,11 @@ class NamespaceTestCase(unittest.TestCase):
       set(['aaa.bbb', 'aaa.bbb.ccc.ddd']))
     self.assertEquals('aaa.bbb', closest)
 
+    closest = namespace.GetClosestNamespaceForSymbol(
+      'goog.string.startsWith',
+      set(['goog.string', 'goog.string.Unicode']))
+    self.assertEquals('goog.string', closest)
+
   def testGetNamespaceParts(self):
     self.assertEquals(
       ['goog', 'string', 'startsWith'],
