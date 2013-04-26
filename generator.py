@@ -64,7 +64,7 @@ def _MakeFunctionSummary(name, function):
   for flag in function.comment.flags:
     if flag.name == '@param':
       name, type, _ = flags.ParseParameterDescription(flag.text)
-      container.appendChild(_MakeTextNode(type))
+      container.appendChild(_MakeTextNode('{%s}' % type))
       container.appendChild(_MakeTextNode(' '))
       container.appendChild(_MakeTextNode(name))
   
