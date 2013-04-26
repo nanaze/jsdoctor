@@ -17,6 +17,12 @@ class FlagTestCase(unittest.TestCase):
       ('var_args', '...*', 'The items to substitute into the pattern.'),
       flags.ParseParameterDescription(desc))
 
+
+    desc = '{string} aaa'
+    self.assertEquals(
+      ('aaa', 'string', ''),
+      flags.ParseParameterDescription(desc))
+
     self.assertRaises(
       ValueError, 
       lambda: flags.ParseParameterDescription('desc without type'))
