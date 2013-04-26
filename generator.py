@@ -6,7 +6,7 @@ def GenerateDocs(namespace_map):
   for namespace, symbols in namespace_map.iteritems():
     filepath = '%s.html' % namespace
     doc = _GenerateDocument(namespace, symbols)
-    content = doc.documentElement.toprettyxml(indent='  ')
+    content = doc.documentElement.toxml()
     yield filepath, content
 
 def _MakeTextNode(content):
