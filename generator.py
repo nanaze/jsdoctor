@@ -89,6 +89,11 @@ def _MakeFunctionSummary(name, function):
     container.appendChild(_MakeTextNode(' : '))
     type, _ = flags.ParseReturnDescription(return_flag.text)
     container.appendChild(_MakeTextNode('{%s}' % type))
+
+  if function.comment.description_sections:
+    desc = function.comment.description_sections[0]
+    container.appendChild(_MakeElement('br'))
+    container.appendChild(_MakeTextNode(desc))
     
   return container
   
