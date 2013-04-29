@@ -27,7 +27,7 @@ def _ReplaceSymbol(match, symbols):
 
   return full_match
 
-def LinkifySymbols(str, symbols):
+def LinkifySymbols(content, symbols):
   return _SYMBOL_RE.sub(
       lambda match: _ReplaceSymbol(match, symbols),
       content)
