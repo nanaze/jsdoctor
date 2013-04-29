@@ -11,6 +11,14 @@ class LinkifyTestCase(unittest.TestCase):
       'aaa <a href="http://google.com">http://google.com</a> bbb',
       linkify.LinkifyWebUrls('aaa http://google.com bbb'))
 
+  def testMatchSymbols(self):
+    matches = linkify._SYMBOL_RE.finditer('aaa goog.dom#cars bb.cc')
+    match_strings = [match.group(0) for match in matches]
+    
+    self.assertEquals(
+        ['aaa', 'goog.dom#cars', 'bb.cc'],
+        match_strings)
+    
 if __name__ == '__main__':
     unittest.main()
 
