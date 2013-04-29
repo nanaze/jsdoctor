@@ -107,21 +107,33 @@ def _MakeFunctionCodeElement(name, function):
     code.appendChild(_MakeTextNode(_GetReturnString(return_flag)))
   return code
   
-def _MakeFunctionSummary(name, function):
-  container = _MakeElement('p')
-  code = _MakeFunctionCodeElement(name, function)
-  container.appendChild(code)  
+def _MakeFunctionSummaryList(functions):
+  summary_list = _MakeElement('dl')
 
-  if function.comment.description_sections:
-    desc = function.comment.description_sections[0]
-    container.appendChild(_MakeElement('br'))
-    container.appendChild(_ProcessString(desc))
+  for function in functions:
 
-  return container
+    summary_term = _MakeElement('dt')
+    summary_list.appendChild(summary_term)
+
+    if _IsStatic(function):
+      name = function.identifier
+    else:
+      name = function.property
+      
+    code = _MakeFunctionCodeElement(name, function)
+    summary_term.appendChild(code)
+
+    summary_definition = _MakeElement('dd')
+    summary_term.appendChild(summary_definition)
+
+    if function.comment.description_sections:
+      desc = function.comment.description_sections[0]
+      summary_definition.appendChild(_ProcessString(desc))
+
+  return summary_list
 
 def _AddFunctionDescription(node_list, function):
-
-  header = _MakeElement('h2', function.identifier)
+  header = _MakeElement('h3', function.identifier)
   header.setAttribute('id', function.identifier)
   node_list.append(header)
 
@@ -168,7 +180,7 @@ def _AddFunctionDescription(node_list, function):
       code_type = _MakeElement('code', '{%s}' % type)
       definition.appendChild(code_type)
       definition.appendChild(_MakeTextNode(' '))
-      definition.appendChild(_ProcessString(flag.text))
+      definition.appendChild(_ProcessString(desc))
       term.appendChild(definition)
 
   if return_flag:
@@ -223,15 +235,19 @@ def _GenerateContent(namespace, symbols):
   static_functions = filter(_IsStatic,
       _GetSymbolsOfType(sorted_symbols, symboltypes.FUNCTION))
 
-  if instance_methods:
-    node_list.append(_MakeElement('h2', 'Method summary'))
-    for method in instance_methods:
-      node_list.append(_MakeFunctionSummary(method.property, method))
+  public_instance_methods = filter(
+      lambda m: flags.GetVisibility(m.comment.flags) == flags.PUBLIC,
+      instance_methods)
+  if public_instance_methods:
+    node_list.append(_MakeElement('h2', 'Public instance method summary'))
+    node_list.append(_MakeFunctionSummaryList(public_instance_methods))
 
+  public_static_methods = filter(
+      lambda m: flags.GetVisibility(m.comment.flags) == flags.PUBLIC,
+      static_functions)
   if static_functions:
-    node_list.append(_MakeElement('h2', 'Static method summary'))
-    for function in static_functions:
-      node_list.append(_MakeFunctionSummary(function.identifier, function))      
+    node_list.append(_MakeElement('h2', 'Public static method summary'))
+    node_list.append(_MakeFunctionSummaryList(public_static_methods))
 
   # Enumerations
   enum_symbols = _GetSymbolsOfType(
