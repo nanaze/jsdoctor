@@ -4,6 +4,7 @@ import html5lib
 
 import symboltypes
 import flags
+import linkify
 
 def GenerateDocs(namespace_map):
   for namespace, symbols in namespace_map.iteritems():
@@ -13,6 +14,7 @@ def GenerateDocs(namespace_map):
     yield filepath, content
 
 def _ProcessString(content):
+  content = linkify.LinkifyWebUrls(content)
   return html5lib.parseFragment(content, treebuilder='dom')
 
 def _MakeTextNode(content):
