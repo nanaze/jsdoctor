@@ -129,6 +129,7 @@ def _AddFunctionDescription(node_list, function):
   param_flags = list(_YieldParamFlags(function.comment.flags))
 
   function_interface = ''
+  function_interface += flags.GetVisibility(function.comment.flags) + ' '
   function_interface += '%s(' % function.identifier
 
   # Draw parameters
@@ -150,6 +151,38 @@ def _AddFunctionDescription(node_list, function):
     function_interface += ' : ' + _GetReturnString(return_flag)
 
   node_list.append(_MakeElement('pre', function_interface))
+
+  # Parameter list
+  if param_flags:
+    node_list.append(_MakeElement('h4', 'Parameters:'))
+    
+    param_list = _MakeElement('dl')
+    node_list.append(param_list)
+    for flag in param_flags:
+      name, type, desc = flags.ParseParameterDescription(flag.text)
+      term = _MakeElement('dt', name)
+      param_list.appendChild(term)
+
+      definition = _MakeElement('dd')
+    
+      code_type = _MakeElement('code', '{%s}' % type)
+      definition.appendChild(code_type)
+      definition.appendChild(_MakeTextNode(' '))
+      definition.appendChild(_ProcessString(flag.text))
+      term.appendChild(definition)
+
+  if return_flag:
+    node_list.append(_MakeElement('h4', 'Returns:'))
+    return_paragraph = _MakeElement('p')
+    node_list.append(return_paragraph)
+
+    type, desc = flags.ParseReturnDescription(return_flag.text)
+    code_type = _MakeElement('code', '{%s}' % type)
+    return_paragraph.appendChild(code_type)
+    return_paragraph.appendChild(_MakeTextNode(' '))
+    return_paragraph.appendChild(_ProcessString(desc))
+    
+    
 
   # Add description paragraphs
   for section in function.comment.description_sections:
@@ -210,7 +243,9 @@ def _GenerateContent(namespace, symbols):
 
   if instance_methods:
     node_list.append(_MakeElement('h2', 'Instance methods'))
-    _AddSymbolDescriptions(node_list, instance_methods)
+    for method in instance_methods:
+      _AddFunctionDescription(node_list, method)
+      node_list.append(_MakeElement('hr'))
 
   if instance_properties:
     node_list.append(_MakeElement('h2', 'Instance properties'))
