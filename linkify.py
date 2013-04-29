@@ -10,10 +10,25 @@ def _ReplaceWebUrl(url_match):
 def LinkifyWebUrls(str):
   return _WEB_URL_RE.sub(_ReplaceWebUrl, 'aaa http://google.com bbb')
 
-_SYMBOL_RE = re.compile('\w+(?:\.\w+)*(#\w+)?')
+_SYMBOL_RE = re.compile('(\w+(?:\.\w+)*)(#\w+)?')
 
-def _ReplaceClosureSymbol
+def _ReplaceSymbol(match, symbols):
+  full_match = match.group(0)
+  symbol_portion = match.group(1)
+  hash_portion = match.group(2)
 
-def LinkifyClosureSymbols(str, symbols):
-  # TODO START HERE
-  pass
+  if symbol_portion in symbols:
+    href = '%s.html' % symbol_portion
+
+    if hash_portion:
+      href + hash_portion
+
+    return '<a href="%s">%s</a>' % (href, full_match)
+
+  return full_match
+
+def LinkifySymbols(str, symbols):
+  return _SYMBOL_RE.sub(
+      lambda match: _ReplaceSymbol(match, symbols),
+      'aaa goog.dom#cars bb.cc')
+
