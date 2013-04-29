@@ -7,8 +7,8 @@ def _ReplaceWebUrl(url_match):
   link = '<a href="%s">%s</a>' % (url, url)
   return link
 
-def LinkifyWebUrls(str):
-  return _WEB_URL_RE.sub(_ReplaceWebUrl, 'aaa http://google.com bbb')
+def LinkifyWebUrls(content):
+  return _WEB_URL_RE.sub(_ReplaceWebUrl, content)
 
 _SYMBOL_RE = re.compile('(\w+(?:\.\w+)*)(#\w+)?')
 
@@ -30,5 +30,4 @@ def _ReplaceSymbol(match, symbols):
 def LinkifySymbols(str, symbols):
   return _SYMBOL_RE.sub(
       lambda match: _ReplaceSymbol(match, symbols),
-      'aaa goog.dom#cars bb.cc')
-
+      content)
