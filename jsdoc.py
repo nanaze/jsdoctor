@@ -35,7 +35,7 @@ def _ProcessCommentSection(section_text):
     remaining_text = remaining_text[0:flag_match.start()]
 
   # The description is whatever wasn't part of a flag.
-  description = remaining_text.strip()
+  description = remaining_text
 
   return description, flags
       
