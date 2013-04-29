@@ -101,4 +101,22 @@ def ParseReturnDescription(desc):
     raise ValueError('Could not parse flag description: %s' % desc)
   return (match.group('type').strip(),
           match.group('desc').strip())
+
+PUBLIC = 'public'
+PROTECTED = 'protected'
+PRIVATE = 'private'
+
+def GetVisibility(flags):
+  """Returns one of PUBLIC, PROTECTED, or PRIVATE."""
+
+  flag_names = [flag.name for flag in flags]
+  if '@private' in flag_names:
+    return PRIVATE
+
+  if '@protected' in flag_names:
+    return PROTECTED
+
+  return PUBLIC
+
+    
           

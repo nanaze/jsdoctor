@@ -2,6 +2,7 @@
 import flags
 import unittest
 import re
+import source
 
 class FlagTestCase(unittest.TestCase):
 
@@ -37,6 +38,40 @@ class FlagTestCase(unittest.TestCase):
     self.assertRaises(
       ValueError, 
       lambda: flags.ParseReturnDescription('desc without type'))
+
+  def testGetVisibility(self):
+    test_source = source.ScanScript("""\
+goog.provide('abc');
+
+/**
+ * @private
+ */
+abc.def;
+""")
+    symbol = list(test_source.symbols)[0]
+    self.assertEquals(flags.PRIVATE, flags.GetVisibility(symbol.comment.flags))
+
+    test_source = source.ScanScript("""\
+goog.provide('abc');
+
+/**
+ * @protected
+ */
+abc.def;
+""")
+    symbol = list(test_source.symbols)[0]
+    self.assertEquals(flags.PROTECTED, flags.GetVisibility(symbol.comment.flags))
+
+    test_source = source.ScanScript("""\
+goog.provide('abc');
+
+/**
+ */
+abc.def;
+""")
+    symbol = list(test_source.symbols)[0]
+    self.assertEquals(flags.PUBLIC, flags.GetVisibility(symbol.comment.flags))
+
   
     
 if __name__ == '__main__':
