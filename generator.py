@@ -66,39 +66,43 @@ def _MakeLink(text, href):
   a.setAttribute('href', href)
   return a
 
-def _MakeFunctionCodeElement(name, function):
-  code = _MakeElement('code')
-  code.appendChild(_MakeLink(name, '#' + name))
-  code.appendChild(_MakeTextNode('('))
+def _YieldParamFlags(flags):
+  for flag in flags:
+    if flag.name == '@param':
+      yield flag
 
-  param_flags = filter(lambda flag: flag.name == '@param',
-                       function.comment.flags)
+def _GetParamString(flag):
+  assert flag.name == '@param'
+  name, type, _ = flags.ParseParameterDescription(flag.text)
+  return '{%s} %s' % (type, name)
 
-  for index, flag in enumerate(param_flags):
-    name, type, _ = flags.ParseParameterDescription(flag.text)
-
-    code.appendChild(_MakeTextNode('{%s}' % type))
-    code.appendChild(_MakeTextNode(' '))
-    code.appendChild(_MakeTextNode(name))
-
-    # If this is not the last param, add a comma
-    last_index = (len(param_flags) - 1)
-    if index != last_index:
-      code.appendChild(_MakeTextNode(', '))
-
-  code.appendChild(_MakeTextNode(')'))
-
-  return_flags = filter(lambda flag: flag.name == '@return',
-                        function.comment.flags)      
-
+def _GetReturnFlag(flags):
+  return_flags = filter(lambda flag: flag.name == '@return', flags)
   assert(len(return_flags) <= 1, 'There should not be more than one @return flag.')
 
   if return_flags:
-    return_flag = return_flags[0]
-    code.appendChild(_MakeTextNode(' : '))
-    type, _ = flags.ParseReturnDescription(return_flag.text)
-    code.appendChild(_MakeTextNode('{%s}' % type))
+    return return_flags[0]
 
+def _GetReturnString(flag):
+  assert flag.name == '@return'
+  type, _ = flags.ParseReturnDescription(flag.text)
+  return '{%s}' % type
+  
+def _MakeFunctionCodeElement(name, function):
+  code = _MakeElement('code')
+  code.appendChild(_MakeLink(name, '#' + name))
+
+  param_flags = list(_YieldParamFlags(function.comment.flags))
+  param_strings = [_GetParamString(flag) for flag in param_flags]
+  param_line = ', '.join(param_strings)
+
+  text_node = _MakeTextNode('(%s)' % param_line)
+  code.appendChild(text_node)
+  
+  return_flag = _GetReturnFlag(function.comment.flags)
+  if return_flag:
+    code.appendChild(_MakeTextNode(' : '))
+    code.appendChild(_MakeTextNode(_GetReturnString(return_flag)))
   return code
   
 def _MakeFunctionSummary(name, function):
@@ -112,7 +116,44 @@ def _MakeFunctionSummary(name, function):
     container.appendChild(_ProcessString(desc))
 
   return container
-  
+
+def _AddFunctionDescription(node_list, function):
+
+  header = _MakeElement('h2', function.identifier)
+  header.setAttribute('id', function.identifier)
+  node_list.append(header)
+
+  # Draw function signature
+  param_flags = list(_YieldParamFlags(function.comment.flags))
+
+  function_interface = ''
+  function_interface += '%s(' % function.identifier
+
+  # Draw parameters
+  if param_flags:
+    for index, flag in enumerate(param_flags):
+      function_interface += '\n  %s' % _GetParamString(flag)
+
+      # If this is not the last parameter, draw a comma.
+      if index != (len(param_flags) - 1):
+        function_interface += ','
+      else:
+        function_interface += '\n'
+        
+  function_interface += ')'
+
+  # Draw return
+  return_flag = _GetReturnFlag(function.comment.flags)
+  if return_flag:
+    function_interface += ' : ' + _GetReturnString(return_flag)
+
+  node_list.append(_MakeElement('pre', function_interface))
+
+  # Add description paragraphs
+  for section in function.comment.description_sections:
+    section_paragraph = _MakeElement('p')
+    section_paragraph.appendChild(_ProcessString(section))
+    node_list.append(section_paragraph)
 
 def _GenerateContent(namespace, symbols):
 
@@ -175,7 +216,9 @@ def _GenerateContent(namespace, symbols):
 
   if static_functions:
     node_list.append(_MakeElement('h2', 'Static methods'))
-    _AddSymbolDescriptions(node_list, static_functions)  
+    for function in static_functions:
+      _AddFunctionDescription(node_list, function)
+      node_list.append(_MakeElement('hr'))
 
   static_properties = filter(_IsStatic,
       _GetSymbolsOfType(sorted_symbols, symboltypes.PROPERTY))
