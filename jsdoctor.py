@@ -11,11 +11,6 @@ import generator
 import StringIO
 import tarfile
 
-def _ScanPath(path):
-  logging.info('Scanning source %s' % path)
-  with open(path) as f:
-    script = f.read()
-  return source.ScanScript(script, path)
 
 def _ShouldScanPath(path):
   _, filename = os.path.split(path)
@@ -72,7 +67,10 @@ def _MakeSymbolMap(symbols):
   
   return symbol_map
 
-class DuplicateSymbolError(Exception):
+class JsDoctorError(Exception):
+  pass
+
+class DuplicateSymbolError(JsDoctorError):
   pass
 
 
@@ -82,9 +80,26 @@ def _MakeNamespaceMap(symbols):
     namespace_map[symbol.namespace].add(symbol)
   return namespace_map
 
-def _ScanPathsInParallel(paths):
-  pool = multiprocessing.Pool(8 * multiprocessing.cpu_count())
-  return pool.imap(_ScanPath, paths)
+def _ScanContent(content_pair):
+  path, content = content_pair
+  return source.ScanScript(content, path)
+  
+def _ScanContentInParallel(content_map):
+  pool = multiprocessing.Pool(20 * multiprocessing.cpu_count())
+  return pool.imap(_ScanContent, content_map.iteritems())
+
+def _MakeContentMap(paths):
+  content_map = dict()
+  for path in paths:
+    if path in content_map:
+      raise JsDoctorError('Path already added: %s', path)
+
+    with open(path) as f:
+      content = f.read()
+      
+    content_map[path] = content
+
+  return content_map
 
 def _ParseArgs():
   parser = argparse.ArgumentParser(description='Generates HTML docs for JsDoc')
@@ -101,10 +116,13 @@ def main():
   tar_path = result.tar
   
   paths = result.files
-  paths = (path for path in paths if _ShouldScanPath(path))
+  paths = [path for path in paths if _ShouldScanPath(path)]
 
-  # This can be parallelized if needed.
-  sources = _ScanPathsInParallel(paths)
+  logging.info('Found %s paths.', len(paths))
+  logging.info('Reading file contents.')
+  content_map = _MakeContentMap(paths)
+
+  sources = _ScanContentInParallel(content_map)
   symbols = _GetSymbolsFromSources(sources)
 
   # This could instead be just a dupe check
