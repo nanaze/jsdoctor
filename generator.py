@@ -6,12 +6,15 @@ import symboltypes
 import flags
 import linkify
 
-def GenerateDocs(namespace_map):
-  for namespace, symbols in namespace_map.iteritems():
-    filepath = '%s.html' % namespace
-    doc = _GenerateDocument(namespace, symbols)
-    content = doc.documentElement.toxml('utf-8')
+def GenerateHtmlDocs(namespace_map):
+  for filepath, document in GenerateDocuments(namespace_map):
+    content = document.documentElement.toxml('utf-8')
     yield filepath, content
+
+def GenerateDocuments(namespace_map):
+  for namespace, symbols in namespace_map.iteritems():
+    filename = '%s.html' % namespace    
+    yield filename, _GenerateDocument(namespace, symbols)
 
 def _ProcessString(content):
   content = linkify.LinkifyWebUrls(content)
@@ -53,15 +56,15 @@ def _GenerateDocument(namespace, symbols):
     
   return doc
 
-def _AddSymbolDescriptions(node_list, symbols):
-  for symbol in symbols:
-    node_list.append(_MakeElement('h3', symbol.identifier))
-    for section in symbol.comment.description_sections:
-      elem = _ProcessString(section)
-      p = _MakeElement('p')
-      node_list.append(p)
-      p.appendChild(elem)
-    node_list.append(_MakeElement('hr'))
+def _AddSymbolDescription(node_list, symbol):
+  node_list.append(_MakeElement('h3', symbol.identifier))
+  for section in symbol.comment.description_sections:
+    elem = _ProcessString(section)
+    p = _MakeElement('p')
+    node_list.append(p)
+    p.appendChild(elem)
+  
+
 
 def _MakeLink(text, href):
   a = _MakeElement('a', text)
@@ -193,8 +196,6 @@ def _AddFunctionDescription(node_list, function):
     return_paragraph.appendChild(code_type)
     return_paragraph.appendChild(_MakeTextNode(' '))
     return_paragraph.appendChild(_ProcessString(desc))
-    
-    
 
   # Add description paragraphs
   for section in function.comment.description_sections:
@@ -216,7 +217,8 @@ def _GenerateContent(namespace, symbols):
 
   if constructor_symbols:
     node_list.append(_MakeElement('h2', 'Constructor'))
-    _AddSymbolDescriptions(node_list, constructor_symbols)
+    for constructor in constructor_symbols:
+      _AddSymbolDescription(node_list, constructor)
 
   # Interface
   interface_symbols = _GetSymbolsOfType(
@@ -224,7 +226,8 @@ def _GenerateContent(namespace, symbols):
         
   if interface_symbols:
     node_list.append(_MakeElement('h2', 'Interface'))
-    _AddSymbolDescriptions(node_list, interface_symbols)
+    for interface in interface_symbols:
+      _AddSymbolDescription(node_list, interface)
 
   instance_methods = filter(_IsNotStatic,
       _GetSymbolsOfType(sorted_symbols, symboltypes.FUNCTION))
@@ -255,7 +258,8 @@ def _GenerateContent(namespace, symbols):
   
   if enum_symbols:
     node_list.append(_MakeElement('h2', 'Enumerations'))
-    _AddSymbolDescriptions(node_list, enum_symbols)
+    for enum_symbol in enum_symbols:
+      _AddSymbolDescription(node_list, enum_symbol)
 
   if instance_methods:
     node_list.append(_MakeElement('h2', 'Instance methods'))
@@ -265,10 +269,13 @@ def _GenerateContent(namespace, symbols):
 
   if instance_properties:
     node_list.append(_MakeElement('h2', 'Instance properties'))
-    _AddSymbolDescriptions(node_list, instance_properties)      
+    for property in instance_properties:
+      _AddSymbolDescription(node_list, property)
+      node_list.append(_MakeElement('hr'))
 
   if static_functions:
     node_list.append(_MakeElement('h2', 'Static methods'))
+    node_list.append(_MakeElement('hr'))
     for function in static_functions:
       _AddFunctionDescription(node_list, function)
       node_list.append(_MakeElement('hr'))
@@ -277,15 +284,8 @@ def _GenerateContent(namespace, symbols):
       _GetSymbolsOfType(sorted_symbols, symboltypes.PROPERTY))
   if static_properties:
     node_list.append(_MakeElement('h2', 'Static properties'))
-    _AddSymbolDescriptions(node_list, static_properties)      
+    for property in static_properties:
+      _AddSymbolDescription(node_list, property)
+      node_list.append(_MakeElement('hr'))    
 
   return node_list
-
-
-                       
-    
-  
-
-  
-
-  

@@ -39,6 +39,30 @@ class FlagTestCase(unittest.TestCase):
       ValueError, 
       lambda: flags.ParseReturnDescription('desc without type'))
 
+  def testMabyeParseTypeFromDescription(self):
+    self.assertEquals(
+      'aaa',
+      flags.MaybeParseTypeFromDescription('  {aaa} bbb ccc'))
+
+    self.assertEquals(
+      None,
+      flags.MaybeParseTypeFromDescription('aaa bbb ccc'))
+
+  @staticmethod
+  def GetFlags(script):
+    desc, flags = source._GetDescriptionAndFlags(script)
+    return flags
+  
+  def testGetSymbolType(self):
+    self.assertEquals(
+      'aaa', flags.GetSymbolType(self.GetFlags("""@const {aaa}""")))
+    self.assertEquals(
+      'bbb', flags.GetSymbolType(self.GetFlags("""@private {bbb}""")))
+    self.assertEquals(
+      'ccc', flags.GetSymbolType(self.GetFlags("""@protected {ccc}""")))
+    self.assertEquals(
+      'ddd', flags.GetSymbolType(self.GetFlags("""@const {ddd}""")))
+
   def testGetVisibility(self):
     test_source = source.ScanScript("""\
 goog.provide('abc');

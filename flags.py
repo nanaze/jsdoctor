@@ -118,5 +118,17 @@ def GetVisibility(flags):
 
   return PUBLIC
 
+def GetSymbolType(flags):
+  for flag in flags:
+    if flag.name in ['@type', '@const', '@protected', '@private']:
+      flag_type = MaybeParseTypeFromDescription(flag.text)
+      if flag_type:
+        return flag_type
+          
+def MaybeParseTypeFromDescription(desc):
+  match = re.match(r'^\s*{(?P<type>.*?)}', desc, re.DOTALL | re.MULTILINE)
+  if match:
+    return match.group('type')
+
     
           

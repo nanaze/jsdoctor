@@ -134,7 +134,7 @@ def main():
 
   logging.info('Writing to tar: %s', tar_path)
   with tarfile.open(name=tar_path, mode='w') as tar:
-    for path, content in generator.GenerateDocs(namespace_map):
+    for path, content in generator.GenerateHtmlDocs(namespace_map):
       logging.info('Writing doc to tar: %s', path)
       # Add each path to the tar
       info = tarfile.TarInfo(name=path)
