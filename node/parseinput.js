@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var esprima = require('../third_party/esprima/esprima.js');
 
 function main() {
