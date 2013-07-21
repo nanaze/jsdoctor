@@ -68,6 +68,7 @@ MISC_FLAGS = frozenset([
     '@supported',
     '@hidden',
     '@final',
+    '@idGenerator',
     '@this'    
     ])
 
