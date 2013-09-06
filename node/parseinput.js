@@ -16,7 +16,11 @@ function handleStdInEnd() {
     console.log('Source read from standard input.');
 
     console.log('Parsing...');
-    var obj = esprima.parse(source);
+    var obj = esprima.parse(source, {
+	'loc': true,
+	'range': true,
+	'comment': true
+    });
 
     console.log('Parsing complete.');
 
