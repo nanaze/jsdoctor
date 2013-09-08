@@ -6,6 +6,7 @@ import os
 import json
 import logging
 import sys
+import esprima
 
 def main():
   logging.basicConfig(level=logging.INFO)
@@ -14,7 +15,21 @@ def main():
   ProcessJsonTree(obj)
 
 def ProcessJsonTree(json_obj):
-  pass
+
+  result = dict()
+  
+  for path, source in json_obj.iteritems():
+    logging.info('Parsing path %s', path)
+
+    ast = esprima.parse(source)
+
+    if path:
+      raise Exception('Path %s defined twice' % path)
+
+    result[path] = {
+      'source': source,
+      'ast': ast
+    }
 
 if __name__ == '__main__':
   main()
