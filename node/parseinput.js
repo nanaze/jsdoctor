@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-var path = require('path');
-var esprimaPath = path.resolve(__dirname, '../third_party/esprima/esprima.js');
-var esprima = require(esprimaPath);
+var esprima = require('esprima');
 
 function main() {
     process.stdin.resume();
