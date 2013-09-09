@@ -2,30 +2,41 @@
 
 var esprima = require('esprima');
 
-function main() {
-    process.stdin.resume();
-    process.stdin.setEncoding('utf8');
-
-    console.log('Waiting for standard input...');
-    process.stdin.on('end', handleStdInEnd);
+function log(msg) {
+    process.stderr.write(msg + '\n');
 }
 
-function handleStdInEnd() {
-    console.log('Standard input ended.');
-    var source = process.stdin.read();
-    console.log('Source read from standard input.');
+function main() {
 
-    console.log('Parsing...');
-    var obj = esprima.parse(source, {
+    var stdin = process.stdin;
+
+    var content = '';
+
+    stdin.on('data', function (data) {
+	content += data;
+    });
+
+    stdin.on('end', function () {
+	log('Source read from standard input.');
+	var obj = processScript(content);
+
+	log('Writing resulting JSON to standard output');
+	var jsonStr = JSON.stringify(obj);
+	process.stdout.setEncoding('utf8');
+	process.stdout.write(jsonStr);
+    });
+
+    stdin.resume();
+}
+
+function processScript(script) {
+    log('Parsing...');
+    return esprima.parse(script, {
 	'loc': true,
 	'range': true,
 	'comment': true
     });
-
-    console.log('Parsing complete.');
-
-    console.log('Writing resulting JSON to standard output');
-    process.stdout.write(JSON.stringify(obj))
 }
+
 
 main();

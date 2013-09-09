@@ -21,9 +21,10 @@ def ProcessJsonTree(json_obj):
   for path, source in json_obj.iteritems():
     logging.info('Parsing path %s', path)
 
-    ast = esprima.parse(source)
-
-    if path:
+    ast_json = esprima.parse(source)
+    ast = json.loads(ast_json)
+    
+    if path in result:
       raise Exception('Path %s defined twice' % path)
 
     result[path] = {
