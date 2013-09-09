@@ -14,6 +14,8 @@ def main():
   obj = json.loads(input)
   ProcessJsonTree(obj)
 
+  sys.stdout.write(json.dumps(obj))
+
 def ProcessJsonTree(json_obj):
 
   result = dict()
@@ -31,6 +33,8 @@ def ProcessJsonTree(json_obj):
       'source': source,
       'ast': ast
     }
+
+    return result
 
 if __name__ == '__main__':
   main()
