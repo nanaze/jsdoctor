@@ -34,7 +34,7 @@ def ProcessJsonTree(json_obj):
       'ast': ast
     }
 
-    return result
+  return result
 
 if __name__ == '__main__':
   main()
