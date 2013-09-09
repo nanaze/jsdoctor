@@ -4,6 +4,7 @@ import StringIO
 import os
 import subprocess
 import logging
+import codecs
 
 
 def GetParseInputPath():
