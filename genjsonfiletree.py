@@ -42,7 +42,6 @@ def ScanTree(tree_root):
 
   for relpath, abspath in _YieldJsPaths(tree_root):
     logging.info('Reading file: %s', relpath)
-    logging.info('abspath: %s', abspath)
     with open(abspath) as f:
       tree[relpath] = f.read()
 
@@ -64,8 +63,10 @@ def main():
   logging.info('Scanning tree. Path: "%s"', dir_root)
 
   tree = ScanTree(dir_root)
-  sys.stdout.write(json.dumps(tree))
-
+  resulting_json = json.dumps(tree)
+  sys.stdout.write(resulting_json)
+  sys.stdout.flush()
+  
 
 if __name__ == '__main__':
   main()
