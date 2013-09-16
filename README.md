@@ -14,7 +14,7 @@ There had been some effort to repurpose [Closure Linter](http://closure-linter.g
 Other JsDoc systems _kind of_ work on Closure, but the flag/type syntax used by Closure is foreign to these tools.
 
 I, [nanaze](http://github.com/nanaze), wanted to take a shot at doing this in a more lo-fi manner, possibly repurposing an exisiting parser like [Esprima](http://esprima.org/). But quick prototyping led me to extract JsDoc with regular
-expressions in Python which, though duct-tape-like, works surprisingly well and quickly.
+expressions in Python which, though duct-tape-like, works surprisingly well and quickly. <em>Update: I have begun migrating over to esprima and pulling symbol/JSDoc info from the resulting AST. This work is in esprima.py, genfiletree.py, processfiletree.py</em> 
 
 Design Goals and Guidlines
 ---
