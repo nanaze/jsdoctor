@@ -18,10 +18,22 @@ def _CreateEsprimaProcess():
       stdin=subprocess.PIPE,
       stdout=subprocess.PIPE)
   return proc
+
+def _GetCpuCount():
+  if sys.platform == 'darwin':
+    return int(subprocess.check_output(['sysctl', '-n', 'hw.logicalcpu']))
+
+  if sys.platform == 'linux':
+    return os.sysconf('SC_NPROCESSORS_ONLN')
+
+  raise NotImplementedError(
+      '_GetCpuCount not implemented for platform %s' % sys.platform)
+
+def MultiParse(sources, num_threads=None):
+  if num_threads is None:
+    num_threads = _GetCpuCount() * 3
   
 
-def MultiParse(sources, num_threads):
-  pass
 
 def parse(source):
   proc = _CreateEsprimaProcess()
