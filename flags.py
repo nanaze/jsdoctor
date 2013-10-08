@@ -49,7 +49,8 @@ PROPERTY_FLAGS = frozenset([
     '@enum',
     '@struct',
     '@type',
-    '@inheritDoc'
+    '@inheritDoc',
+    '@export'
     ])
 
 INTERFACE_FLAGS = frozenset([
